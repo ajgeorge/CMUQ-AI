@@ -16,6 +16,7 @@
     "dev": "concurrently --kill-others-on-fail --names server,client --prefix-colors blue,green \"npm run dev -w server\" \"npm run dev -w client\"",
     "build": "tsc -b && npm run build -w client",
     "start": "node server/dist/index.js",
+    "check:ai": "npm run check:ai -w server",
     "typecheck": "tsc -b",
     "lint": "eslint .",
     "format": "prettier --write .",
