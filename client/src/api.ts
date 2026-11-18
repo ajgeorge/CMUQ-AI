@@ -1,4 +1,11 @@
-import { ApiErrorSchema, type HealthResponse } from '@bank-sim/shared';
+import {
+  ApiErrorSchema,
+  type ChatRequest,
+  type ChatResponse,
+  type ClientsResponse,
+  type HealthResponse,
+  type ProductsResponse,
+} from '@bank-sim/shared';
 
 /** Error thrown for any failed API call, carrying a message safe to show users. */
 export class ApiRequestError extends Error {
@@ -32,9 +39,18 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
   if (!res.ok) {
     const parsed = ApiErrorSchema.safeParse(body);
-    throw parsed.success
-      ? new ApiRequestError(parsed.data.error.message, res.status, parsed.data.error.code)
-      : new ApiRequestError(`Request failed (HTTP ${res.status}).`, res.status, 'UNKNOWN');
+    if (parsed.success) {
+      throw new ApiRequestError(parsed.data.error.message, res.status, parsed.data.error.code);
+    }
+    // Not our API's error format: something in between answered instead (e.g. a proxy
+    // when the API server is down), so describe it plainly rather than show a status code.
+    throw new ApiRequestError(
+      res.status >= 500
+        ? 'The server is not responding right now. Please try again in a moment.'
+        : 'Something went wrong with that request. Please try again.',
+      res.status,
+      'UNKNOWN',
+    );
   }
 
   return body as T;
@@ -42,4 +58,15 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
 export const api = {
   health: (signal?: AbortSignal) => request<HealthResponse>('/health', { signal }),
+  clients: (signal?: AbortSignal) => request<ClientsResponse>('/clients', { signal }),
+  products: (signal?: AbortSignal) => request<ProductsResponse>('/products', { signal }),
+  chat: (body: ChatRequest, signal?: AbortSignal) =>
+    request<ChatResponse>('/chat', { method: 'POST', body: JSON.stringify(body), signal }),
 };
+
+/** A message safe to show the student for any error thrown by the calls above. */
+export function errorMessage(err: unknown): string {
+  return err instanceof ApiRequestError
+    ? err.message
+    : 'Something unexpected went wrong. Please try again.';
+}
