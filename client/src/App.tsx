@@ -3,6 +3,7 @@ import type { Bank, Product, PublicClient } from '@bank-sim/shared';
 import { api, errorMessage } from './api';
 import { ClientSelect } from './components/ClientSelect';
 import { InterviewChat } from './components/InterviewChat';
+import { ProductPanel } from './components/ProductPanel';
 import { StepIndicator } from './components/StepIndicator';
 import { SummaryForm } from './components/SummaryForm';
 import { initialState, limitReached, reducer, type Action, type AppState } from './state';
@@ -133,6 +134,7 @@ function Screen({ state, data, dispatch, focusHeading }: ScreenProps) {
               onEnd={() => dispatch({ type: 'endInterview' })}
               onLeave={() => dispatch({ type: 'restart' })}
             />
+            <ProductPanel products={data.products} />
           </div>
         </>
       );
