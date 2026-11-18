@@ -2,9 +2,12 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import express, { type ErrorRequestHandler, type Request, type Response } from 'express';
 import type { HealthResponse } from '@bank-sim/shared';
+import { AiError } from './ai/errors.js';
+import type { Ai } from './ai/client.js';
 import type { Content } from './content.js';
 import { sendError } from './http.js';
 import { CLIENT_DIST, REPO_ROOT } from './paths.js';
+import { chatRouter } from './routes/chat.js';
 import { contentRouter } from './routes/content.js';
 
 function readVersion(): string {
@@ -13,7 +16,12 @@ function readVersion(): string {
   return pkg.version ?? '0.0.0';
 }
 
-export function createApp(content: Content): express.Express {
+export interface AppDeps {
+  content: Content;
+  ai: Ai;
+}
+
+export function createApp({ content, ai }: AppDeps): express.Express {
   const app = express();
   const version = readVersion();
 
@@ -28,6 +36,7 @@ export function createApp(content: Content): express.Express {
   });
 
   api.use(contentRouter(content));
+  api.use(chatRouter(content, ai));
 
   // Unknown API route → JSON 404 (never fall through to the SPA).
   api.use((req, res) => {
@@ -47,6 +56,11 @@ export function createApp(content: Content): express.Express {
 
   // --- Error handler: never leak stack traces to the browser ---
   const errorHandler: ErrorRequestHandler = (err: unknown, _req, res, _next) => {
+    // AI failures are already classified and logged; send the student-friendly message.
+    if (err instanceof AiError) {
+      sendError(res, err.status, err.code, err.message);
+      return;
+    }
     if (err instanceof SyntaxError && 'body' in err) {
       sendError(res, 400, 'BAD_REQUEST', 'Request body is not valid JSON.');
       return;

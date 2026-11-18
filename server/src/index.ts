@@ -1,5 +1,6 @@
 import { env } from './env.js';
 import { createApp } from './app.js';
+import { aiConfigFromEnv, createAi } from './ai/client.js';
 import { ContentError, loadContent, type Content } from './content.js';
 
 function loadContentOrExit(): Content {
@@ -20,7 +21,9 @@ console.log(
     `for ${content.bank.name}.`,
 );
 
-const app = createApp(content);
+console.log(`AI: client uses ${env.CLIENT_MODEL}, coach uses ${env.COACH_MODEL}.`);
+
+const app = createApp({ content, ai: createAi(aiConfigFromEnv(env)) });
 
 const server = app.listen(env.PORT, () => {
   console.log(`Server listening on http://localhost:${env.PORT} (${env.NODE_ENV})`);

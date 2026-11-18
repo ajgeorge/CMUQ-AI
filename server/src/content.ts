@@ -13,6 +13,7 @@ import {
   type PublicClient,
 } from '@bank-sim/shared';
 import { CONTENT_DIR } from './paths.js';
+import { formatPath } from './format.js';
 
 export const PRODUCTS_FILE = 'products.json';
 export const CLIENTS_DIR = 'clients';
@@ -203,12 +204,4 @@ function readJsonFile<S extends z.ZodType>(
     return undefined;
   }
   return result.data;
-}
-
-/** ["needs", 1, "revealWhen"] → "needs[1].revealWhen" */
-function formatPath(segments: PropertyKey[]): string {
-  return segments.reduce<string>((acc, key) => {
-    if (typeof key === 'number') return `${acc}[${key}]`;
-    return acc ? `${acc}.${String(key)}` : String(key);
-  }, '');
 }

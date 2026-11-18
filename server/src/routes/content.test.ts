@@ -2,6 +2,7 @@ import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { ClientsResponse, ProductsResponse, PublicClient } from '@bank-sim/shared';
+import type { Ai } from '../ai/client.js';
 import { createApp } from '../app.js';
 import { loadContent } from '../content.js';
 
@@ -10,7 +11,12 @@ let server: Server;
 let baseUrl: string;
 
 beforeAll(async () => {
-  server = createApp(content).listen(0);
+  // These endpoints never call the AI, so any call to it is a bug.
+  const ai: Ai = {
+    generate: () => Promise.reject(new Error('The content API should not call the AI')),
+    sdk: undefined as never,
+  };
+  server = createApp({ content, ai }).listen(0);
   await new Promise<void>((resolve) => server.once('listening', resolve));
   baseUrl = `http://localhost:${(server.address() as AddressInfo).port}/api`;
 });
