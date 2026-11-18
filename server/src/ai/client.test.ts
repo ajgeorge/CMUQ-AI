@@ -96,7 +96,7 @@ describe('generate', () => {
     const { ai, requests } = setup([completion('Hi, I run a catering business.')]);
     await ai.generate('client', hello);
 
-    expect(requests[0]).toMatchObject({ model: 'fast-model', temperature: 0.8 });
+    expect(requests[0]).toMatchObject({ model: 'fast-model', temperature: 0.5 });
     expect(requests[0]).not.toHaveProperty('response_format');
     expect(requests[0]).not.toHaveProperty('reasoning_effort');
   });

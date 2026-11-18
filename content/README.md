@@ -30,17 +30,17 @@ clients/maria/hidden-needs.json → needs[1].revealWhen: must not be empty
 
 ## profile.json
 
-| Field         | Shown to student? | What it is                                                            |
-| ------------- | ----------------- | --------------------------------------------------------------------- |
-| `name`        | Yes               | Full name                                                             |
-| `age`         | Yes               | Age in years                                                          |
-| `occupation`  | Yes               | Job or business                                                       |
-| `location`    | Yes               | Where they live                                                       |
-| `difficulty`  | Yes               | `beginner`, `intermediate` or `advanced`                              |
-| `summary`     | Yes               | One or two sentences the student reads before the interview           |
-| `openingLine` | Yes               | The first thing the client says. Keep it vague: no hidden needs here. |
-| `personality` | No (AI only)      | How the client talks and behaves                                      |
-| `background`  | No (AI only)      | Facts the AI can use to answer questions realistically                |
+| Field         | Shown to student? | What it is                                                                                                                                                |
+| ------------- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`        | Yes               | Full name                                                                                                                                                 |
+| `age`         | Yes               | Age in years                                                                                                                                              |
+| `occupation`  | Yes               | Job or business                                                                                                                                           |
+| `location`    | Yes               | Where they live                                                                                                                                           |
+| `difficulty`  | Yes               | `beginner`, `intermediate` or `advanced`. Also sets how open the client is: beginners hint, advanced clients only answer specific questions               |
+| `summary`     | Yes               | One or two sentences the student reads before the interview. The client also uses it to answer general questions like "How can I help?", so keep it vague |
+| `openingLine` | Yes               | The first thing the client says. Keep it vague: no hidden needs here.                                                                                     |
+| `personality` | No (AI only)      | How the client talks and behaves                                                                                                                          |
+| `background`  | No (AI only)      | Facts the AI can use to answer questions realistically                                                                                                    |
 
 ## hidden-needs.json
 

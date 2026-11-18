@@ -8,7 +8,7 @@ export type AiRole = 'client' | 'coach';
 
 export type ReasoningEffort = 'low' | 'medium' | 'high';
 
-export interface ChatMessage {
+export interface AiMessage {
   role: 'system' | 'user' | 'assistant';
   content: string;
 }
@@ -31,8 +31,10 @@ export interface AiConfig {
  * Note that for reasoning models, maxTokens also covers the hidden "thinking" tokens.
  */
 const ROLE_SETTINGS: Record<AiRole, { temperature: number; maxTokens: number; json: boolean }> = {
-  // Natural, varied conversation in short replies.
-  client: { temperature: 0.8, maxTokens: 512, json: false },
+  // Natural, varied conversation in short replies. Tested live: at 0.8 the client often
+  // volunteered private details in answer to general questions; 0.5 keeps them hidden
+  // while replies still vary naturally.
+  client: { temperature: 0.5, maxTokens: 512, json: false },
   // Consistent judgement, returned as JSON so the app can check it.
   coach: { temperature: 0.2, maxTokens: 4096, json: true },
 };
@@ -62,7 +64,7 @@ export interface AiCallLog {
 export type AiLogger = (entry: AiCallLog) => void;
 
 export interface Ai {
-  generate(role: AiRole, messages: ChatMessage[]): Promise<AiResult>;
+  generate(role: AiRole, messages: AiMessage[]): Promise<AiResult>;
   /** Raw SDK client, for the setup check (listing models). */
   readonly sdk: OpenAI;
 }
@@ -76,7 +78,7 @@ export function createAi(config: AiConfig, log: AiLogger = logToConsole): Ai {
     ...(config.fetch ? { fetch: config.fetch } : {}),
   });
 
-  async function generate(role: AiRole, messages: ChatMessage[]): Promise<AiResult> {
+  async function generate(role: AiRole, messages: AiMessage[]): Promise<AiResult> {
     const { model, reasoningEffort } = config.models[role];
     const settings = ROLE_SETTINGS[role];
     const params: ChatCompletionCreateParamsNonStreaming = {
