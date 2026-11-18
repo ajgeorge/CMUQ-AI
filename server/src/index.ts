@@ -1,7 +1,26 @@
 import { env } from './env.js';
 import { createApp } from './app.js';
+import { ContentError, loadContent, type Content } from './content.js';
 
-const app = createApp();
+function loadContentOrExit(): Content {
+  try {
+    return loadContent();
+  } catch (err) {
+    if (err instanceof ContentError) {
+      console.error(`\n${err.message}\n\nFix the files in the content folder and restart.\n`);
+      process.exit(1);
+    }
+    throw err;
+  }
+}
+
+const content = loadContentOrExit();
+console.log(
+  `Loaded ${content.clients.length} clients and ${content.products.length} products ` +
+    `for ${content.bank.name}.`,
+);
+
+const app = createApp(content);
 
 const server = app.listen(env.PORT, () => {
   console.log(`Server listening on http://localhost:${env.PORT} (${env.NODE_ENV})`);

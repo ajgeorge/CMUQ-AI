@@ -1,8 +1,11 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import express, { type ErrorRequestHandler, type Request, type Response } from 'express';
-import type { ApiError, ApiErrorCode, HealthResponse } from '@bank-sim/shared';
+import type { HealthResponse } from '@bank-sim/shared';
+import type { Content } from './content.js';
+import { sendError } from './http.js';
 import { CLIENT_DIST, REPO_ROOT } from './paths.js';
+import { contentRouter } from './routes/content.js';
 
 function readVersion(): string {
   const pkgPath = path.join(REPO_ROOT, 'package.json');
@@ -10,12 +13,7 @@ function readVersion(): string {
   return pkg.version ?? '0.0.0';
 }
 
-function sendError(res: Response, status: number, code: ApiErrorCode, message: string): void {
-  const body: ApiError = { error: { code, message } };
-  res.status(status).json(body);
-}
-
-export function createApp(): express.Express {
+export function createApp(content: Content): express.Express {
   const app = express();
   const version = readVersion();
 
@@ -28,6 +26,8 @@ export function createApp(): express.Express {
   api.get('/health', (_req: Request, res: Response<HealthResponse>) => {
     res.json({ status: 'ok', uptimeSeconds: Math.round(process.uptime()), version });
   });
+
+  api.use(contentRouter(content));
 
   // Unknown API route → JSON 404 (never fall through to the SPA).
   api.use((req, res) => {

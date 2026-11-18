@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Bank, Product, PublicClient } from './content.js';
 
 /** Response of GET /api/health. */
 export const HealthResponseSchema = z.object({
@@ -23,3 +24,14 @@ export const ApiErrorSchema = z.object({
   }),
 });
 export type ApiError = z.infer<typeof ApiErrorSchema>;
+
+/** Response of GET /api/clients. */
+export interface ClientsResponse {
+  clients: PublicClient[];
+}
+
+/** Response of GET /api/products. */
+export interface ProductsResponse {
+  bank: Bank;
+  products: Product[];
+}
