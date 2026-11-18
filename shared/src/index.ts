@@ -1,7 +1,6 @@
 /**
- * Shared API contract between the server and the client.
- *
- * Schemas live here so both sides agree on request/response shapes.
- * Content schemas (clients, products) and coach feedback are added in later phases.
+ * Shared contract between the server and the client: API shapes and content schemas.
+ * Both sides import from here so they always agree.
  */
 export * from './api.js';
+export * from './content.js';

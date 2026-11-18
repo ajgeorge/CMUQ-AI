@@ -3,5 +3,8 @@ import path from 'node:path';
 /** Repository root (works from both `src/` in dev and `dist/` in production). */
 export const REPO_ROOT = path.resolve(import.meta.dirname, '..', '..');
 
+/** Editable content: client profiles, hidden needs and the product catalogue. */
+export const CONTENT_DIR = path.join(REPO_ROOT, 'content');
+
 /** Built React app, served by Express in production. */
 export const CLIENT_DIST = path.join(REPO_ROOT, 'client', 'dist');
