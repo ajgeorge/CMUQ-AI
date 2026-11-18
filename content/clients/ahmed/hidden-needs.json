@@ -1,0 +1,77 @@
+{
+  "needs": [
+    {
+      "id": "cash-flow-gap",
+      "importance": "critical",
+      "description": "Corporate clients usually pay invoices 60 to 90 days after the event, but he has to pay staff and suppliers within 30 days. Twice this year he delayed paying suppliers, and once he used his personal savings to cover payroll.",
+      "revealWhen": "The student asks about cash flow, how and when he gets paid, payment terms, working capital, or the biggest challenges in the business.",
+      "exampleQuestions": [
+        "How long do your corporate clients usually take to pay you?",
+        "How do you manage the gap between paying staff and receiving payments?",
+        "What is the biggest financial challenge in the business right now?"
+      ]
+    },
+    {
+      "id": "sharia-only",
+      "importance": "critical",
+      "description": "He will only use Sharia-compliant banking and financing. Last year he turned down a conventional loan from his current bank for this reason. If offered an interest-based product, he declines firmly and explains why.",
+      "revealWhen": "The student asks about his banking preferences, any requirements products must meet, or the type of financing he would consider, or the student recommends an interest-based product.",
+      "exampleQuestions": [
+        "Do you have any preferences or requirements for the kind of banking products you use?",
+        "Are there any types of financing you would not consider?"
+      ]
+    },
+    {
+      "id": "second-kitchen",
+      "importance": "medium",
+      "description": "Plans to open a second central kitchen in Al Wakrah within 12 months. He needs about QAR 1.5 million: roughly QAR 900,000 for kitchen equipment and QAR 600,000 for fit-out and renovation.",
+      "revealWhen": "The student asks about future plans, growth goals, or what the business needs in order to keep growing.",
+      "exampleQuestions": [
+        "Where do you see the business in the next year or two?",
+        "What will you need to keep growing?"
+      ]
+    },
+    {
+      "id": "current-bank-service",
+      "importance": "low",
+      "description": "Currently banks elsewhere and is frustrated by slow responses and having to visit a branch for simple tasks. He would move his business account for better service.",
+      "revealWhen": "The student asks about his current banking arrangements or how happy he is with his current bank.",
+      "exampleQuestions": [
+        "Who do you bank with at the moment, and how is that working for you?",
+        "What would you like to be different about your banking?"
+      ]
+    }
+  ],
+  "productFit": {
+    "suitable": [
+      {
+        "productId": "islamic-receivables-finance",
+        "reason": "Sharia-compliant short-term financing against his corporate invoices closes the 60 to 90 day payment gap, and he meets the turnover and audited accounts requirements."
+      },
+      {
+        "productId": "tijara-business-account",
+        "reason": "A Sharia-compliant business account with WPS payroll and full digital banking. It is required for receivables finance and addresses his frustration with slow service."
+      }
+    ],
+    "acceptable": [
+      {
+        "productId": "ijara-equipment-finance",
+        "reason": "Sharia-compliant and suits the roughly QAR 900,000 of equipment for the second kitchen, but it does not cover the fit-out and renovation costs."
+      }
+    ],
+    "unsuitable": [
+      {
+        "productId": "business-flex-overdraft",
+        "reason": "Interest-based, so it conflicts with his requirement for Sharia-compliant products, even though it would help with cash flow."
+      },
+      {
+        "productId": "personal-consolidation-loan",
+        "reason": "A personal, interest-based loan. It is not designed for business financing and conflicts with his Sharia requirement."
+      },
+      {
+        "productId": "growth-equity-fund",
+        "reason": "An investment product that does nothing for his cash flow or expansion needs, and it is not Sharia-compliant."
+      }
+    ]
+  }
+}

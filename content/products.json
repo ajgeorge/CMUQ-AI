@@ -1,0 +1,214 @@
+{
+  "bank": {
+    "name": "Pearl Coast Bank",
+    "currency": "QAR"
+  },
+  "products": [
+    {
+      "id": "tijara-business-account",
+      "name": "Tijara Business Account",
+      "category": "business",
+      "type": "account",
+      "shariaCompliant": true,
+      "summary": "A Sharia-compliant current account for small and medium-sized businesses.",
+      "features": [
+        "Sharia-compliant current account (no interest paid or charged)",
+        "Payroll through the Wage Protection System (WPS)",
+        "Free local transfers and a business debit card",
+        "Full online and mobile banking, including approvals by multiple signatories",
+        "Dedicated relationship manager for businesses with turnover above QAR 3 million"
+      ],
+      "limitations": [
+        "No profit is paid on the account balance",
+        "Monthly fee if the average balance falls below the minimum",
+        "Cheque book limited to 50 cheques per month"
+      ],
+      "eligibility": [
+        "Business registered in Qatar with a valid Commercial Registration",
+        "Trading for at least 1 year"
+      ],
+      "fees": "No monthly fee with an average balance of QAR 50,000 or more; otherwise QAR 100 per month."
+    },
+    {
+      "id": "islamic-receivables-finance",
+      "name": "Islamic Receivables Finance",
+      "category": "business",
+      "type": "financing",
+      "shariaCompliant": true,
+      "summary": "Short-term Sharia-compliant financing that releases cash tied up in unpaid invoices.",
+      "features": [
+        "Advance of up to 80% of the value of approved invoices",
+        "Based on Murabaha: a fixed profit amount agreed upfront, with no compounding",
+        "Terms of 30 to 120 days to match customers' payment terms",
+        "Revolving limit: as invoices are paid, the limit becomes available again"
+      ],
+      "limitations": [
+        "Only invoices issued to approved, creditworthy corporate or government customers",
+        "Requires 2 years of audited financial statements",
+        "Requires a Tijara Business Account with Pearl Coast Bank",
+        "Does not fund long-term investments such as new premises or equipment"
+      ],
+      "eligibility": ["Trading for at least 2 years", "Annual turnover of at least QAR 2 million"],
+      "fees": "Profit rate agreed per transaction; one-off arrangement fee of 0.5% of the approved limit."
+    },
+    {
+      "id": "business-flex-overdraft",
+      "name": "Business Flex Overdraft",
+      "category": "business",
+      "type": "financing",
+      "shariaCompliant": false,
+      "summary": "A conventional revolving overdraft for day-to-day working capital.",
+      "features": [
+        "Limit of up to QAR 500,000 on a business current account",
+        "Interest charged only on the amount actually used",
+        "Use any time without applying again"
+      ],
+      "limitations": [
+        "Interest-based, so not Sharia-compliant",
+        "Variable interest rate that can rise with market rates",
+        "Requires a personal guarantee from the business owner",
+        "Reviewed every year and can be reduced or withdrawn"
+      ],
+      "eligibility": [
+        "Trading for at least 2 years",
+        "Business current account held with Pearl Coast Bank"
+      ],
+      "fees": "Variable interest on the amount used; annual renewal fee of 0.5% of the limit."
+    },
+    {
+      "id": "ijara-equipment-finance",
+      "name": "Ijara Equipment Finance",
+      "category": "business",
+      "type": "financing",
+      "shariaCompliant": true,
+      "summary": "Sharia-compliant lease-to-own financing for business equipment.",
+      "features": [
+        "Finances up to QAR 3 million of new equipment",
+        "Ijara (lease-to-own): the bank buys the equipment and leases it to the business",
+        "Ownership passes to the business at the end of the lease",
+        "Fixed monthly rentals over 3 to 5 years"
+      ],
+      "limitations": [
+        "Covers equipment only, not renovation, fit-out or working capital",
+        "The bank owns the equipment until the final payment",
+        "Takaful (Islamic insurance) on the equipment is required",
+        "Down payment of 20% of the equipment cost"
+      ],
+      "eligibility": ["Trading for at least 2 years", "Supplier quotation for the equipment"],
+      "fees": "Rental rate agreed at signing; arrangement fee of 1% of the financed amount."
+    },
+    {
+      "id": "everyday-salary-account",
+      "name": "Everyday Salary Account",
+      "category": "personal",
+      "type": "account",
+      "shariaCompliant": false,
+      "summary": "A personal current account for salaried employees, with low-cost transfers abroad.",
+      "features": [
+        "4 free international transfers per month to over 30 countries",
+        "Preferential exchange rates on transfers abroad",
+        "Free debit card and mobile banking",
+        "Transfers can be scheduled to repeat every month"
+      ],
+      "limitations": [
+        "Salary must be paid into the account",
+        "Conventional account, not Sharia-compliant",
+        "Transfers after the 4 free ones cost QAR 15 each"
+      ],
+      "eligibility": ["Monthly salary of at least QAR 5,000", "Valid Qatar ID"],
+      "fees": "No monthly fee while the salary is paid in; otherwise QAR 25 per month."
+    },
+    {
+      "id": "personal-consolidation-loan",
+      "name": "Personal Consolidation Loan",
+      "category": "personal",
+      "type": "financing",
+      "shariaCompliant": false,
+      "summary": "A fixed-rate personal loan to combine and pay off existing debts, including overseas debts.",
+      "features": [
+        "Borrow up to QAR 200,000 at a fixed interest rate",
+        "Repay over 12 to 48 months with equal monthly instalments",
+        "Can be used to pay off credit cards and loans in Qatar or abroad",
+        "One monthly payment instead of several"
+      ],
+      "limitations": [
+        "Interest-based, so not Sharia-compliant",
+        "Requires an Everyday Salary Account with the salary paid in",
+        "Monthly repayments cannot exceed 50% of salary",
+        "Early settlement fee of 1% of the remaining balance"
+      ],
+      "eligibility": [
+        "At least 6 months with the current employer",
+        "Monthly salary of at least QAR 5,000"
+      ],
+      "fees": "Fixed interest rate agreed at signing; processing fee of 1% of the loan (maximum QAR 1,000)."
+    },
+    {
+      "id": "wakala-term-deposit",
+      "name": "Wakala Term Deposit",
+      "category": "personal",
+      "type": "savings",
+      "shariaCompliant": true,
+      "summary": "A low-risk Sharia-compliant deposit that earns an expected profit over a fixed term.",
+      "features": [
+        "Wakala: the bank invests the money as an agent in low-risk Sharia-compliant assets",
+        "Terms of 3, 6 or 12 months",
+        "Expected profit rate shown before opening; profit paid at maturity",
+        "Several deposits with different terms can be opened, so money becomes available at different times"
+      ],
+      "limitations": [
+        "The profit rate is expected, not guaranteed",
+        "Money is locked in for the chosen term",
+        "Withdrawing early returns the original amount but no profit"
+      ],
+      "eligibility": ["Minimum deposit of QAR 10,000", "Pearl Coast Bank personal account"],
+      "fees": "No fees; the bank's agency fee is already reflected in the expected profit rate."
+    },
+    {
+      "id": "global-currency-account",
+      "name": "Global Currency Account",
+      "category": "personal",
+      "type": "account",
+      "shariaCompliant": true,
+      "summary": "A Sharia-compliant account that holds QAR, USD, GBP and EUR in one place.",
+      "features": [
+        "Hold and switch between QAR, USD, GBP and EUR",
+        "Preferential exchange rates, including for regular monthly conversions",
+        "Pay international fees, such as university tuition, directly in the foreign currency",
+        "Multi-currency debit card for spending abroad"
+      ],
+      "limitations": [
+        "No profit is paid on balances",
+        "The QAR value of GBP and EUR balances changes with exchange rates",
+        "Monthly fee if the total balance falls below the minimum"
+      ],
+      "eligibility": ["Pearl Coast Bank personal account", "Valid Qatar ID"],
+      "fees": "No monthly fee with a combined balance of QAR 10,000 or more; otherwise QAR 50 per month."
+    },
+    {
+      "id": "growth-equity-fund",
+      "name": "Growth Equity Fund",
+      "category": "personal",
+      "type": "investment",
+      "shariaCompliant": false,
+      "summary": "An investment fund in global company shares, aiming for long-term growth.",
+      "features": [
+        "Invests in a broad mix of global company shares",
+        "Potential for higher returns over the long term",
+        "Start with a lump sum or monthly amounts from QAR 1,000",
+        "Value can be checked daily in the mobile app"
+      ],
+      "limitations": [
+        "Capital is at risk: the value can fall and investors can get back less than they put in",
+        "Recommended minimum holding period of 5 years",
+        "Not Sharia-compliant: the fund holds conventional banks and other non-compliant companies",
+        "Selling in the first year costs an extra 1%"
+      ],
+      "eligibility": [
+        "Completed investment risk questionnaire",
+        "Pearl Coast Bank personal account"
+      ],
+      "fees": "2% entry fee and 1.5% annual management fee."
+    }
+  ]
+}

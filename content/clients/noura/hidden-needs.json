@@ -1,0 +1,71 @@
+{
+  "needs": [
+    {
+      "id": "uk-university",
+      "importance": "critical",
+      "description": "Her daughter Layla plans to study in the UK in about 3 years. Tuition and living costs will be around GBP 50,000 a year (roughly QAR 230,000 to 250,000), paid in pounds for 3 to 4 years.",
+      "revealWhen": "The student asks what 'the children's future' means specifically, about timelines, where the children will study, or which currency the costs will be in.",
+      "exampleQuestions": [
+        "When you say your children's future, what exactly are you planning for?",
+        "Where and when are they likely to study, and in what currency will you be paying?"
+      ]
+    },
+    {
+      "id": "no-capital-risk",
+      "importance": "critical",
+      "description": "She lost about QAR 120,000 investing in shares in 2020 and will not accept any product where her capital could fall in value. She reacts strongly against investment funds.",
+      "revealWhen": "The student asks about her attitude to risk, past investment experience, or how she would feel if the value went down, or the student recommends an investment fund.",
+      "exampleQuestions": [
+        "Have you invested before? How did that go?",
+        "How would you feel if the value of your savings went down for a while?"
+      ]
+    },
+    {
+      "id": "emergency-access",
+      "importance": "medium",
+      "description": "Wants part of her savings available at short notice for emergencies, rather than all of it locked away for a long term.",
+      "revealWhen": "The student asks about access to her money, flexibility, or what would happen in an emergency.",
+      "exampleQuestions": [
+        "How quickly might you need to get to some of this money?",
+        "Do you want to keep some of it available for emergencies?"
+      ]
+    },
+    {
+      "id": "second-child",
+      "importance": "medium",
+      "description": "Her son Omar is two years younger and is likely to study abroad too, so the plan needs to cover both children, with costs overlapping for a few years.",
+      "revealWhen": "The student asks about the rest of the family, whether the plan should cover both children, or the longer-term picture.",
+      "exampleQuestions": [
+        "Should this plan cover both of your children?",
+        "What does the next six or seven years look like for the family?"
+      ]
+    }
+  ],
+  "productFit": {
+    "suitable": [
+      {
+        "productId": "global-currency-account",
+        "reason": "Lets her build up pounds gradually ahead of tuition payments, reducing exchange-rate surprises, and pay the university directly in GBP."
+      },
+      {
+        "productId": "wakala-term-deposit",
+        "reason": "Low-risk growth on savings that are currently earning nothing. Splitting it across 3, 6 and 12-month terms keeps part of the money close to maturity for emergencies."
+      }
+    ],
+    "acceptable": [],
+    "unsuitable": [
+      {
+        "productId": "growth-equity-fund",
+        "reason": "Her capital would be at risk, which she has ruled out after her 2020 losses, and the 5-year recommended holding period is longer than her 3-year need."
+      },
+      {
+        "productId": "personal-consolidation-loan",
+        "reason": "She has no debts to consolidate."
+      },
+      {
+        "productId": "business-flex-overdraft",
+        "reason": "A business product; not relevant to her personal goals."
+      }
+    ]
+  }
+}

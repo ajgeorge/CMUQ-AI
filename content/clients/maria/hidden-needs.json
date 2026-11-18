@@ -1,0 +1,62 @@
+{
+  "needs": [
+    {
+      "id": "remittances",
+      "importance": "critical",
+      "description": "Sends about QAR 3,000 to her family in Manila every month through an exchange house. She queues on her day off and pays around QAR 20 to 25 per transfer, plus a poor exchange rate.",
+      "revealWhen": "The student asks about her regular expenses, her family, financial commitments, or sending money abroad.",
+      "exampleQuestions": [
+        "What are your regular monthly expenses or commitments?",
+        "Do you send money to family back home? How do you do that at the moment?"
+      ]
+    },
+    {
+      "id": "card-debt-at-home",
+      "importance": "critical",
+      "description": "Owes about QAR 12,000 (equivalent) on a credit card in the Philippines at roughly 36% annual interest, from her family's medical bills. She only pays the minimum each month and is embarrassed about it.",
+      "revealWhen": "The student asks tactfully about existing loans, debts, credit cards or financial commitments. If asked bluntly or in a judging way, she gives a vague answer first and only shares details once the student is reassuring.",
+      "exampleQuestions": [
+        "Do you have any existing loans or credit cards, here or back home?",
+        "Is there anything you are currently paying off?"
+      ]
+    },
+    {
+      "id": "car-savings",
+      "importance": "medium",
+      "description": "Wants to save about QAR 25,000 within a year to buy a used car. She is very risk-averse: she has never invested and does not want to risk losing any money.",
+      "revealWhen": "The student asks about her goals, what she is saving for, her timeline, or how she feels about risk.",
+      "exampleQuestions": [
+        "What would you like to save for, and by when?",
+        "How would you feel if your savings went down in value for a while?"
+      ]
+    }
+  ],
+  "productFit": {
+    "suitable": [
+      {
+        "productId": "everyday-salary-account",
+        "reason": "Moving her salary here gives her 4 free international transfers a month and better exchange rates, cutting the cost of her remittances. It is also required for the consolidation loan."
+      },
+      {
+        "productId": "personal-consolidation-loan",
+        "reason": "Replaces card debt at about 36% interest with a much cheaper fixed-rate loan and a clear end date. The repayments are affordable on her salary and she meets the 6-month employment requirement."
+      }
+    ],
+    "acceptable": [
+      {
+        "productId": "wakala-term-deposit",
+        "reason": "Low risk and fits a 12-month savings goal, but the money is locked in for the term. It makes more sense once her expensive debt is under control."
+      }
+    ],
+    "unsuitable": [
+      {
+        "productId": "growth-equity-fund",
+        "reason": "Capital is at risk and the recommended holding period is 5 years, but she is risk-averse and needs the money within a year."
+      },
+      {
+        "productId": "business-flex-overdraft",
+        "reason": "A business product; she is an individual employee."
+      }
+    ]
+  }
+}
