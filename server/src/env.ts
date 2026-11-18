@@ -9,6 +9,14 @@ const required = (hint: string) => {
   return z.string({ error: message }).trim().min(1, message);
 };
 
+/** Optional; an empty value in .env counts as "not set". Only reasoning models use it. */
+const reasoningEffort = z.preprocess(
+  (value) => (value === '' ? undefined : value),
+  z
+    .enum(['low', 'medium', 'high'], { error: 'must be low, medium or high (or left empty)' })
+    .optional(),
+);
+
 const EnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.coerce.number().int().min(1).max(65535).default(3001),
@@ -18,6 +26,8 @@ const EnvSchema = z.object({
   CLIENT_MODEL: required('the model used by the AI Client'),
   COACH_MODEL: required('the model used by the AI Coach'),
   AI_TIMEOUT_MS: z.coerce.number().int().min(1000).max(300_000).default(30_000),
+  CLIENT_REASONING_EFFORT: reasoningEffort,
+  COACH_REASONING_EFFORT: reasoningEffort,
 });
 
 export type Env = z.infer<typeof EnvSchema>;

@@ -13,7 +13,17 @@ export type HealthResponse = z.infer<typeof HealthResponseSchema>;
  * Stable error codes returned by the API.
  * The client maps these to friendly, user-facing messages.
  */
-export const ApiErrorCodeSchema = z.enum(['NOT_FOUND', 'BAD_REQUEST', 'INTERNAL_ERROR']);
+export const ApiErrorCodeSchema = z.enum([
+  'NOT_FOUND',
+  'BAD_REQUEST',
+  'INTERNAL_ERROR',
+  // AI provider failures (see server/src/ai/errors.ts)
+  'RATE_LIMITED',
+  'AI_TIMEOUT',
+  'AI_UNAVAILABLE',
+  'AI_CONFIG_ERROR',
+  'AI_BAD_RESPONSE',
+]);
 export type ApiErrorCode = z.infer<typeof ApiErrorCodeSchema>;
 
 /** Shape of every error response body from the API. */
