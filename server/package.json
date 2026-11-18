@@ -1,0 +1,22 @@
+{
+  "name": "@bank-sim/server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Express API: serves content, talks to the AI model, and serves the built client.",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch --conditions=development --clear-screen=false src/index.ts",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@bank-sim/shared": "*",
+    "express": "^5.3.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.19.0",
+    "tsx": "^4.23.15"
+  }
+}
