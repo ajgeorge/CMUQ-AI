@@ -1,0 +1,61 @@
+.client-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.client-list > li {
+  display: flex;
+}
+
+.client-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.client-card__name {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.client-card__meta,
+.client-card__difficulty,
+.client-card__summary {
+  margin: 0;
+}
+
+.client-card__meta,
+.client-card__hint {
+  color: var(--color-text-muted);
+  font-size: 0.9375rem;
+}
+
+.client-card__level--beginner {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.client-card__level--intermediate {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+}
+
+.client-card__level--advanced {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+/* Keep the buttons lined up at the bottom of every card. */
+.client-card .button {
+  margin-top: auto;
+  align-self: flex-start;
+}
+
+.client-card__summary {
+  margin-bottom: var(--space-3);
+}

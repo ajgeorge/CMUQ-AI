@@ -1,0 +1,36 @@
+/* Lets keyboard users jump past the header; visible only when focused. */
+.skip-link {
+  position: absolute;
+  left: var(--space-3);
+  top: -100%;
+  z-index: 10;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font-weight: 600;
+  border-radius: var(--radius);
+}
+
+.skip-link:focus {
+  top: var(--space-2);
+}
+
+/* Interview: chat on the left, product reference on the right. */
+.interview-layout {
+  display: grid;
+  gap: var(--space-4);
+  align-items: start;
+}
+
+@media (min-width: 60rem) {
+  .interview-layout {
+    grid-template-columns: minmax(0, 1fr) 22rem;
+  }
+}
+
+/* On narrow screens the "Show products" toggle sits above the chat. */
+@media (max-width: 59.99rem) {
+  .interview-layout .products {
+    order: -1;
+  }
+}

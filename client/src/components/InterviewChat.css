@@ -1,0 +1,117 @@
+.chat {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.chat__messages {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chat__message {
+  max-width: min(36rem, 85%);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius);
+}
+
+.chat__message--client {
+  align-self: flex-start;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-bottom-left-radius: 2px;
+}
+
+.chat__message--student {
+  align-self: flex-end;
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  border-bottom-right-radius: 2px;
+}
+
+.chat__author {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.chat__text {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Rarely used, so it sits above the conversation rather than in the question box. */
+.chat__toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--space-2);
+}
+
+.chat__typing {
+  min-height: 1.5rem;
+  margin: var(--space-2) 0;
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+/* The question box stays at the bottom of the screen while the conversation scrolls. */
+.chat__composer {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3) 0 var(--space-3);
+  background: var(--color-bg);
+  border-top: 1px solid var(--color-border);
+}
+
+.chat__counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+}
+
+.chat__actions {
+  margin-top: var(--space-2);
+}
+
+/* A plain text-style button: leaving is a less common, lower-emphasis action. */
+.chat__leave {
+  min-height: 2.75rem;
+  padding: var(--space-2);
+  border: none;
+  background: none;
+  color: var(--color-primary);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.chat__leave:hover {
+  color: var(--color-primary-hover);
+}
+
+/* Phones: keep the fixed question box small so the conversation has room. */
+@media (max-width: 40rem) {
+  .chat__keys {
+    display: none;
+  }
+
+  .chat__composer {
+    padding: var(--space-2) 0;
+  }
+
+  .chat__composer textarea {
+    height: 3.5rem;
+  }
+
+  .chat__message {
+    max-width: 95%;
+  }
+}
