@@ -80,6 +80,8 @@ silently. A paid tier raises these limits.
 
 ## How it works
 
+The app opens on a short guide to the steps, the difficulty levels and what each button does.
+
 1. **Choose a client.** The browser gets each client's public profile only.
 2. **Interview.** Each question is sent to the server with the conversation so far. The server
    builds the client's prompt from the content files and asks the client model for a reply.

@@ -1,0 +1,80 @@
+.guide {
+  max-width: 48rem;
+}
+
+.guide__start {
+  margin: var(--space-3) 0 var(--space-5);
+}
+
+.guide__section {
+  margin-bottom: var(--space-5);
+}
+
+.guide__section h2 {
+  margin-bottom: var(--space-3);
+}
+
+.guide__steps,
+.guide__notes {
+  margin: 0;
+  padding-left: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Difficulty levels and button lists: one card each, like the rest of the app. */
+.guide__levels {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.guide__levels li,
+.guide__stage {
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.guide__levels p {
+  margin: var(--space-1) 0 0;
+}
+
+.guide__stage + .guide__stage {
+  margin-top: var(--space-3);
+}
+
+.guide__stage h3 {
+  margin: 0 0 var(--space-2);
+  font-size: 1.0625rem;
+}
+
+.guide__stage dl {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.guide__button dt {
+  font-weight: 700;
+}
+
+.guide__button dd {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+/* Side by side on wide screens: the button name, then what it does. */
+@media (min-width: 40rem) {
+  .guide__button {
+    display: grid;
+    grid-template-columns: 14rem 1fr;
+    gap: var(--space-3);
+  }
+}

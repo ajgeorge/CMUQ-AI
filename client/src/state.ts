@@ -32,6 +32,8 @@ interface Interview {
 }
 
 export type AppState =
+  /** The "How it works" page, shown whenever the app is opened. */
+  | { step: 'guide' }
   | { step: 'select' }
   | ({ step: 'interview' } & Interview)
   | ({ step: 'summary' } & Interview)
@@ -44,6 +46,8 @@ export type AppState =
 export type Step = AppState['step'];
 
 export type Action =
+  | { type: 'openClients' }
+  | { type: 'openGuide' }
   | { type: 'start'; client: PublicClient }
   | { type: 'exchange'; question: string; reply: string }
   | { type: 'endInterview' }
@@ -56,11 +60,17 @@ export type Action =
   /** Picks up an interview saved before the page was reloaded (see session.ts). */
   | { type: 'restore'; state: AppState };
 
-export const initialState: AppState = { step: 'select' };
+export const initialState: AppState = { step: 'guide' };
 
 /** Invalid transitions (e.g. ending an interview too early) leave the state unchanged. */
 export function reducer(state: AppState, action: Action): AppState {
   switch (action.type) {
+    case 'openClients':
+      return state.step === 'guide' ? { step: 'select' } : state;
+
+    case 'openGuide':
+      return state.step === 'select' ? { step: 'guide' } : state;
+
     case 'start':
       return { step: 'interview', client: action.client, messages: [], draft: EMPTY_DRAFT };
 
@@ -105,11 +115,12 @@ export function reducer(state: AppState, action: Action): AppState {
         draft: state.draft,
       };
 
+    // Back to the client list (the guide is only shown when the app is opened).
     case 'restart':
-      return initialState;
+      return { step: 'select' };
 
     case 'restore':
-      return state.step === 'select' ? action.state : state;
+      return state.step === 'guide' || state.step === 'select' ? action.state : state;
   }
 }
 

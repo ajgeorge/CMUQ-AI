@@ -35,21 +35,6 @@
   font-size: 0.9375rem;
 }
 
-.client-card__level--beginner {
-  background: var(--color-success-bg);
-  color: var(--color-success);
-}
-
-.client-card__level--intermediate {
-  background: var(--color-warning-bg);
-  color: var(--color-warning);
-}
-
-.client-card__level--advanced {
-  background: var(--color-danger-bg);
-  color: var(--color-danger);
-}
-
 /* Keep the buttons lined up at the bottom of every card. */
 .client-card .button {
   margin-top: auto;

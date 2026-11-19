@@ -208,6 +208,21 @@ textarea[aria-invalid='true'] {
 
 /* --- Messages and badges --- */
 
+/* A button that reads like a link, for small actions inside a sentence. */
+.link-button {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-primary);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.link-button:hover {
+  color: var(--color-primary-hover);
+}
+
 .alert {
   border-radius: var(--radius);
   padding: var(--space-2) var(--space-3);

@@ -1,11 +1,7 @@
-import type { Difficulty, PublicClient } from '@bank-sim/shared';
+import type { PublicClient } from '@bank-sim/shared';
+import { DIFFICULTY } from '../difficulty';
+import { DifficultyBadge } from './Difficulty';
 import './ClientSelect.css';
-
-const DIFFICULTY_HINT: Record<Difficulty, string> = {
-  beginner: 'Open and talkative',
-  intermediate: 'Answers what you ask',
-  advanced: 'Guarded; needs specific questions',
-};
 
 interface Props {
   clients: PublicClient[];
@@ -27,10 +23,8 @@ export function ClientSelect({ clients, onStart }: Props) {
               {client.location}
             </p>
             <p className="client-card__difficulty">
-              <span className={`badge client-card__level client-card__level--${client.difficulty}`}>
-                {capitalise(client.difficulty)}
-              </span>{' '}
-              <span className="client-card__hint">{DIFFICULTY_HINT[client.difficulty]}</span>
+              <DifficultyBadge level={client.difficulty} />{' '}
+              <span className="client-card__hint">{DIFFICULTY[client.difficulty].hint}</span>
             </p>
             <p className="client-card__summary">{client.summary}</p>
             <button type="button" className="button" onClick={() => onStart(client)}>
@@ -41,8 +35,4 @@ export function ClientSelect({ clients, onStart }: Props) {
       ))}
     </ul>
   );
-}
-
-function capitalise(text: string): string {
-  return text.charAt(0).toUpperCase() + text.slice(1);
 }

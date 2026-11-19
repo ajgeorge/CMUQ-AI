@@ -29,7 +29,7 @@ interface Saved {
 
 /** The text to save for this state, or null when there is nothing worth keeping. */
 export function serialise(state: AppState): string | null {
-  if (state.step === 'select') return null;
+  if (state.step === 'guide' || state.step === 'select') return null;
   return JSON.stringify({ version: VERSION, state } satisfies Saved);
 }
 

@@ -3,6 +3,7 @@ import type { Bank, ChatMessage, InterviewSummary, Product, PublicClient } from 
 import { api, errorMessage } from './api';
 import { ClientSelect } from './components/ClientSelect';
 import { FeedbackReport } from './components/FeedbackReport';
+import { Guide } from './components/Guide';
 import { InterviewChat } from './components/InterviewChat';
 import { ProductPanel } from './components/ProductPanel';
 import { StepIndicator } from './components/StepIndicator';
@@ -125,7 +126,8 @@ export function App() {
         <p className="site-title">{APP_NAME}</p>
         {bankName && <p className="site-subtitle">Practise client discovery at {bankName}</p>}
       </header>
-      <StepIndicator current={state.step} />
+      {/* The guide explains the steps itself, so the progress bar starts on the client list. */}
+      {state.step !== 'guide' && <StepIndicator current={state.step} />}
       <main id="main" className="container">
         {loading.status === 'loading' && (
           <p role="status" className="lead">
@@ -177,13 +179,28 @@ function Screen(props: ScreenProps) {
   const heading = <Heading key={screenKey} title={title} focus={focusHeading} />;
 
   switch (state.step) {
+    case 'guide':
+      return (
+        <>
+          {heading}
+          <Guide onStart={() => dispatch({ type: 'openClients' })} />
+        </>
+      );
+
     case 'select':
       return (
         <>
           {heading}
           <p className="lead">
             Each client has needs they won&apos;t mention unless you ask the right questions. Find
-            out what matters to them, then recommend suitable products.
+            out what matters to them, then recommend suitable products.{' '}
+            <button
+              type="button"
+              className="link-button"
+              onClick={() => dispatch({ type: 'openGuide' })}
+            >
+              How it works
+            </button>
           </p>
           <ClientSelect
             clients={data.clients}
@@ -320,6 +337,8 @@ function Heading({ title, focus }: { title: string; focus: boolean }) {
 
 function screenTitle(state: AppState): string {
   switch (state.step) {
+    case 'guide':
+      return 'How it works';
     case 'select':
       return 'Choose a client to interview';
     case 'interview':

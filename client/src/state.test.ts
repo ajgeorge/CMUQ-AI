@@ -158,9 +158,9 @@ describe('reducer', () => {
   });
 
   it('restarts from any step', () => {
-    expect(run({ type: 'start', client: ahmed }, ...ask(3), { type: 'restart' })).toEqual(
-      initialState,
-    );
+    expect(run({ type: 'start', client: ahmed }, ...ask(3), { type: 'restart' })).toEqual({
+      step: 'select',
+    });
   });
 });
 
