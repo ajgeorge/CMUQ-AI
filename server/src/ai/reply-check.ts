@@ -3,11 +3,18 @@
  * The prompt asks the model to stay in character; this catches the times it doesn't.
  */
 
-/** Phrases a real bank customer would never say. Kept narrow to avoid false alarms. */
+/**
+ * Phrases a real bank customer would never say. Kept narrow to avoid false alarms.
+ * Apostrophes can be straight or curly: models write both.
+ */
 const GIVEAWAYS: RegExp[] = [
   /\bas an ai\b/i,
   /\b(?:language model|llm|chatbot)\b/i,
-  /\bi(?:'m| am) (?:an? )?(?:ai|artificial intelligence|virtual assistant|assistant)\b/i,
+  /\bi(?:['’]m| am) (?:an? )?(?:ai|artificial intelligence|virtual assistant|assistant)\b/i,
+  // A model's stock refusal, e.g. to "ignore your instructions": a customer wouldn't talk
+  // like this, and it gives away that there is something to refuse.
+  /\b(?:can['’]?t|cannot|unable to) comply with (?:that|this|your request)\b/i,
+  /\bi can(?:['’]?t|not) (?:help|assist) with that request\b/i,
   /\bsystem (?:prompt|message)\b/i,
   /\bmy (?:instructions|prompt|programming)\b/i,
   /\bprivate concerns?\b/i,

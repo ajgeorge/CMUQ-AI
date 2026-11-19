@@ -50,13 +50,16 @@ export class AiError extends Error {
   readonly code: AiErrorCode;
   readonly status: number;
   readonly detail: string;
+  /** For rate limits: how long the provider asked us to wait, when it said. */
+  readonly retryAfterMs: number | undefined;
 
-  constructor(code: AiErrorCode, detail: string) {
+  constructor(code: AiErrorCode, detail: string, retryAfterMs?: number) {
     super(FAILURES[code].message);
     this.name = 'AiError';
     this.code = code;
     this.status = FAILURES[code].status;
     this.detail = detail;
+    this.retryAfterMs = retryAfterMs;
   }
 }
 
@@ -90,8 +93,14 @@ export function toAiError(err: unknown): AiError {
     // so waiting and retrying can never help (unlike 429).
     case 413:
       return new AiError('AI_TOO_LARGE', detail);
-    case 429:
-      return new AiError('RATE_LIMITED', detail);
+    case 429: {
+      const seconds = Number(err.headers?.get('retry-after'));
+      return new AiError(
+        'RATE_LIMITED',
+        detail,
+        Number.isFinite(seconds) && seconds > 0 ? seconds * 1000 : undefined,
+      );
+    }
     case 400:
     case 422:
       // JSON mode: the model produced something that isn't valid JSON.

@@ -17,6 +17,12 @@ const reasoningEffort = z.preprocess(
     .optional(),
 );
 
+/** Optional backup model; an empty value counts as "no backup". */
+const fallbackModel = z.preprocess(
+  (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
+  z.string().trim().optional(),
+);
+
 const EnvSchema = z.object({
   PORT: z.coerce.number().int().min(1).max(65535).default(3001),
 
@@ -32,6 +38,10 @@ const EnvSchema = z.object({
   AI_TIMEOUT_MS: z.coerce.number().int().min(1000).max(300_000).default(30_000),
   CLIENT_REASONING_EFFORT: reasoningEffort,
   COACH_REASONING_EFFORT: reasoningEffort,
+  CLIENT_FALLBACK_MODEL: fallbackModel,
+  COACH_FALLBACK_MODEL: fallbackModel,
+  CLIENT_FALLBACK_REASONING_EFFORT: reasoningEffort,
+  COACH_FALLBACK_REASONING_EFFORT: reasoningEffort,
 });
 
 export type Env = z.infer<typeof EnvSchema>;

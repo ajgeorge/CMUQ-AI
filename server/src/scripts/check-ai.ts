@@ -1,6 +1,7 @@
 /**
  * Setup check: `npm run check:ai`
- * Confirms the API key works, both configured models exist, and each one answers.
+ * Confirms the API key works, and that each configured model (including any backups)
+ * exists and answers.
  * Prints what to fix when something is wrong. Never prints the API key.
  */
 import { env } from '../env.js';
@@ -10,9 +11,46 @@ import { toAiError } from '../ai/errors.js';
 const ok = (text: string) => console.log(`  ✓ ${text}`);
 const fail = (text: string) => console.log(`  ✗ ${text}`);
 
-const ROLES: { role: AiRole; label: string; envName: string; model: string }[] = [
-  { role: 'client', label: 'AI Client', envName: 'CLIENT_MODEL', model: env.CLIENT_MODEL },
-  { role: 'coach', label: 'AI Coach', envName: 'COACH_MODEL', model: env.COACH_MODEL },
+interface ModelCheck {
+  role: AiRole;
+  label: string;
+  envName: string;
+  model: string;
+  /** Each model is tested on its own: a main model must not pass thanks to its backup. */
+  use: 'main' | 'backup';
+}
+
+const MODELS: ModelCheck[] = [
+  {
+    role: 'client',
+    label: 'AI Client',
+    envName: 'CLIENT_MODEL',
+    model: env.CLIENT_MODEL,
+    use: 'main',
+  },
+  ...(env.CLIENT_FALLBACK_MODEL
+    ? [
+        {
+          role: 'client',
+          label: 'AI Client backup',
+          envName: 'CLIENT_FALLBACK_MODEL',
+          model: env.CLIENT_FALLBACK_MODEL,
+          use: 'backup',
+        } as const,
+      ]
+    : []),
+  { role: 'coach', label: 'AI Coach', envName: 'COACH_MODEL', model: env.COACH_MODEL, use: 'main' },
+  ...(env.COACH_FALLBACK_MODEL
+    ? [
+        {
+          role: 'coach',
+          label: 'AI Coach backup',
+          envName: 'COACH_FALLBACK_MODEL',
+          model: env.COACH_FALLBACK_MODEL,
+          use: 'backup',
+        } as const,
+      ]
+    : []),
 ];
 
 const TEST_MESSAGES: Record<AiRole, { system: string; user: string }> = {
@@ -43,7 +81,7 @@ async function main(): Promise<boolean> {
   }
 
   // 2. Does each configured model exist, and does it answer?
-  for (const { role, label, envName, model } of ROLES) {
+  for (const { role, label, envName, model, use } of MODELS) {
     console.log(`\n${label} (${envName}=${model})`);
 
     if (!available.includes(model)) {
@@ -57,10 +95,14 @@ async function main(): Promise<boolean> {
 
     try {
       const { system, user } = TEST_MESSAGES[role];
-      const result = await ai.generate(role, [
-        { role: 'system', content: system },
-        { role: 'user', content: user },
-      ]);
+      const result = await ai.generate(
+        role,
+        [
+          { role: 'system', content: system },
+          { role: 'user', content: user },
+        ],
+        { use },
+      );
       const left = result.rateLimit.remainingTokens;
       ok(
         `answered in ${result.latencyMs} ms ` +
