@@ -7,6 +7,7 @@ import { InterviewChat } from './components/InterviewChat';
 import { ProductPanel } from './components/ProductPanel';
 import { StepIndicator } from './components/StepIndicator';
 import { SummaryForm } from './components/SummaryForm';
+import { loadSession, saveSession } from './session';
 import { initialState, limitReached, reducer, type Action, type AppState } from './state';
 import './App.css';
 
@@ -17,6 +18,11 @@ interface Catalogue {
   clients: PublicClient[];
   products: Product[];
 }
+
+/** The coach's request, while the feedback screen has no feedback to show yet. */
+type CoachRequest =
+  /** Nothing sent: the page was reloaded while the coach was working. */
+  { status: 'idle' } | { status: 'waiting' } | { status: 'failed'; message: string };
 
 type Loading =
   | { status: 'loading' }
@@ -34,18 +40,21 @@ export function App() {
   // an effect on the feedback screen, so it goes out exactly once per submit (effects run
   // twice in development, which would use up the AI's per-minute allowance).
   const feedbackRequest = useRef<AbortController | null>(null);
-  const [feedbackError, setFeedbackError] = useState<string | null>(null);
+  const [coach, setCoach] = useState<CoachRequest>({ status: 'idle' });
 
   function requestFeedback(clientId: string, messages: ChatMessage[], summary: InterviewSummary) {
     feedbackRequest.current?.abort();
     const controller = new AbortController();
     feedbackRequest.current = controller;
-    setFeedbackError(null);
+    setCoach({ status: 'waiting' });
     api
       .feedback({ clientId, messages, summary }, controller.signal)
-      .then((feedback) => dispatch({ type: 'feedbackReceived', feedback }))
+      .then((feedback) => {
+        dispatch({ type: 'feedbackReceived', feedback });
+        setCoach({ status: 'idle' });
+      })
       .catch((err: unknown) => {
-        if (!controller.signal.aborted) setFeedbackError(errorMessage(err));
+        if (!controller.signal.aborted) setCoach({ status: 'failed', message: errorMessage(err) });
       });
   }
 
@@ -53,7 +62,7 @@ export function App() {
     if (action.type !== 'updateDraft') setNavigated(true);
     if (action.type === 'start' || action.type === 'restart' || action.type === 'backToSummary') {
       feedbackRequest.current?.abort();
-      setFeedbackError(null);
+      setCoach({ status: 'idle' });
     }
     dispatch(action);
     if (action.type === 'submit' && state.step === 'summary') {
@@ -61,7 +70,7 @@ export function App() {
     }
   }
 
-  function retryFeedback() {
+  function getFeedback() {
     if (state.step === 'feedback') requestFeedback(state.client.id, state.messages, state.summary);
   }
 
@@ -71,15 +80,26 @@ export function App() {
   useEffect(() => {
     const controller = new AbortController();
     Promise.all([api.clients(controller.signal), api.products(controller.signal)])
-      .then(([{ clients }, { bank, products }]) =>
-        setLoading({ status: 'ready', data: { bank, clients, products } }),
-      )
+      .then(([{ clients }, { bank, products }]) => {
+        // Pick up an interview from before a page reload, now that it can be checked
+        // against the current clients and products.
+        const saved = loadSession({ clients, products });
+        if (saved) dispatch({ type: 'restore', state: saved });
+        setLoading({ status: 'ready', data: { bank, clients, products } });
+      })
       .catch((err: unknown) => {
         if (controller.signal.aborted) return;
         setLoading({ status: 'error', message: errorMessage(err) });
       });
     return () => controller.abort();
   }, [attempt]);
+
+  // Saved after every change, but only once any earlier interview has been restored,
+  // so the empty starting state can't overwrite it.
+  const ready = loading.status === 'ready';
+  useEffect(() => {
+    if (ready) saveSession(state);
+  }, [ready, state]);
 
   function retry() {
     setLoading({ status: 'loading' });
@@ -118,8 +138,8 @@ export function App() {
             data={loading.data}
             dispatch={act}
             focusHeading={navigated}
-            feedbackError={feedbackError}
-            onRetryFeedback={retryFeedback}
+            coach={coach}
+            onGetFeedback={getFeedback}
           />
         )}
       </main>
@@ -132,13 +152,13 @@ interface ScreenProps {
   data: Catalogue;
   dispatch: (action: Action) => void;
   focusHeading: boolean;
-  feedbackError: string | null;
-  onRetryFeedback: () => void;
+  coach: CoachRequest;
+  onGetFeedback: () => void;
 }
 
 /** The current step's content, with a heading that receives focus when the step changes. */
 function Screen(props: ScreenProps) {
-  const { state, data, dispatch, focusHeading, feedbackError, onRetryFeedback } = props;
+  const { state, data, dispatch, focusHeading, coach, onGetFeedback } = props;
   const title = screenTitle(state);
   // Keyed by step so each screen gets a fresh heading that takes focus when it appears.
   const heading = <Heading key={state.step} title={title} focus={focusHeading} />;
@@ -215,12 +235,23 @@ function Screen(props: ScreenProps) {
               onRestart={() => dispatch({ type: 'restart' })}
               onRetryClient={() => dispatch({ type: 'start', client: state.client })}
             />
-          ) : feedbackError ? (
-            <div role="alert" className="alert alert--error">
-              <p>The coach could not review your interview. {feedbackError}</p>
+          ) : coach.status === 'waiting' ? (
+            <p role="status" className="lead">
+              The coach is reviewing your interview. This usually takes a few seconds…
+            </p>
+          ) : (
+            <div
+              role={coach.status === 'failed' ? 'alert' : undefined}
+              className={`alert ${coach.status === 'failed' ? 'alert--error' : 'alert--info'}`}
+            >
+              <p>
+                {coach.status === 'failed'
+                  ? `The coach could not review your interview. ${coach.message}`
+                  : 'Your interview and summary are saved, but the page was reloaded before the coach replied.'}
+              </p>
               <div className="button-row">
-                <button type="button" className="button" onClick={onRetryFeedback}>
-                  Try again
+                <button type="button" className="button" onClick={onGetFeedback}>
+                  {coach.status === 'failed' ? 'Try again' : 'Get feedback'}
                 </button>
                 <button
                   type="button"
@@ -231,10 +262,6 @@ function Screen(props: ScreenProps) {
                 </button>
               </div>
             </div>
-          ) : (
-            <p role="status" className="lead">
-              The coach is reviewing your interview. This usually takes a few seconds…
-            </p>
           )}
         </>
       );

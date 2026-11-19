@@ -254,33 +254,42 @@ export const CoachOutputSchema = z.object({
 export type CoachOutput = z.infer<typeof CoachOutputSchema>;
 
 /** How a product fits the client, from the client's answer key (not decided by the AI). */
-export type FitRating = 'suitable' | 'acceptable' | 'unsuitable' | 'not-relevant';
+export const FitRatingSchema = z.enum(['suitable', 'acceptable', 'unsuitable', 'not-relevant']);
+export type FitRating = z.infer<typeof FitRatingSchema>;
 
-export interface ProductFitResult {
+export const ProductFitResultSchema = z.object({
   /** Each product the student recommended, in the order they chose them. */
-  recommended: { productId: string; rating: FitRating; reason: string | null }[];
+  recommended: z.array(
+    z.object({ productId: z.string(), rating: FitRatingSchema, reason: z.string().nullable() }),
+  ),
   /** Suitable products the student did not recommend. */
-  missedSuitable: { productId: string; reason: string }[];
-}
+  missedSuitable: z.array(z.object({ productId: z.string(), reason: z.string() })),
+});
+export type ProductFitResult = z.infer<typeof ProductFitResultSchema>;
 
 /** A hidden need, revealed after the interview, with the coach's verdict. */
-export interface NeedFeedback {
-  id: string;
-  title: string;
-  importance: 'critical' | 'medium' | 'low';
-  description: string;
-  status: NeedStatus;
+export const NeedFeedbackSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  importance: z.enum(['critical', 'medium', 'low']),
+  description: z.string(),
+  status: NeedStatusSchema,
   /** Only set when it matches something the student actually asked. */
-  evidence: string | null;
-  comment: string;
-}
+  evidence: z.string().nullable(),
+  comment: z.string(),
+});
+export type NeedFeedback = z.infer<typeof NeedFeedbackSchema>;
 
-/** Response of POST /api/feedback. */
-export interface FeedbackResponse {
-  needs: NeedFeedback[];
-  productFit: ProductFitResult;
-  wentWell: string[];
-  missed: string[];
-  improve: CoachOutput['improve'];
-  productAccuracy: CoachOutput['productAccuracy'];
-}
+/**
+ * Response of POST /api/feedback. A schema rather than only a type so the browser can
+ * check a copy it saved earlier (see client/src/session.ts).
+ */
+export const FeedbackResponseSchema = z.object({
+  needs: z.array(NeedFeedbackSchema),
+  productFit: ProductFitResultSchema,
+  wentWell: z.array(z.string()),
+  missed: z.array(z.string()),
+  improve: CoachOutputSchema.shape.improve,
+  productAccuracy: CoachOutputSchema.shape.productAccuracy,
+});
+export type FeedbackResponse = z.infer<typeof FeedbackResponseSchema>;

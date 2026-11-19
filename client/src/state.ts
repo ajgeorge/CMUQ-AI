@@ -52,7 +52,9 @@ export type Action =
   | { type: 'submit'; summary: InterviewSummary }
   | { type: 'feedbackReceived'; feedback: FeedbackResponse }
   | { type: 'backToSummary' }
-  | { type: 'restart' };
+  | { type: 'restart' }
+  /** Picks up an interview saved before the page was reloaded (see session.ts). */
+  | { type: 'restore'; state: AppState };
 
 export const initialState: AppState = { step: 'select' };
 
@@ -105,6 +107,9 @@ export function reducer(state: AppState, action: Action): AppState {
 
     case 'restart':
       return initialState;
+
+    case 'restore':
+      return state.step === 'select' ? action.state : state;
   }
 }
 
