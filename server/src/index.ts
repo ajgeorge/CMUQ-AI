@@ -23,7 +23,12 @@ console.log(
     `for ${content.bank.name}.`,
 );
 
-console.log(`AI: client uses ${env.CLIENT_MODEL}, coach uses ${env.COACH_MODEL}.`);
+const withBackup = (model: string, backup: string | undefined) =>
+  backup ? `${model} (backup: ${backup})` : model;
+console.log(
+  `AI: client uses ${withBackup(env.CLIENT_MODEL, env.CLIENT_FALLBACK_MODEL)}, ` +
+    `coach uses ${withBackup(env.COACH_MODEL, env.COACH_FALLBACK_MODEL)}.`,
+);
 
 const app = createApp({ content, ai: createAi(aiConfigFromEnv(env)) });
 
