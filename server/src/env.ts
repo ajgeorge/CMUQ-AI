@@ -18,10 +18,14 @@ const reasoningEffort = z.preprocess(
 );
 
 const EnvSchema = z.object({
-  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.coerce.number().int().min(1).max(65535).default(3001),
 
-  AI_BASE_URL: z.url({ error: 'must be a full URL, e.g. https://api.groq.com/openai/v1' }),
+  AI_BASE_URL: z.url({
+    error: (issue) =>
+      issue.input
+        ? 'must be a full URL, e.g. https://api.groq.com/openai/v1'
+        : 'is missing — the address of your AI provider, e.g. https://api.groq.com/openai/v1',
+  }),
   AI_API_KEY: required('your AI provider API key'),
   CLIENT_MODEL: required('the model used by the AI Client'),
   COACH_MODEL: required('the model used by the AI Coach'),

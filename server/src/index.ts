@@ -1,7 +1,9 @@
+import { existsSync } from 'node:fs';
 import { env } from './env.js';
 import { createApp } from './app.js';
 import { aiConfigFromEnv, createAi } from './ai/client.js';
 import { ContentError, loadContent, type Content } from './content.js';
+import { CLIENT_DIST } from './paths.js';
 
 function loadContentOrExit(): Content {
   try {
@@ -26,7 +28,12 @@ console.log(`AI: client uses ${env.CLIENT_MODEL}, coach uses ${env.COACH_MODEL}.
 const app = createApp({ content, ai: createAi(aiConfigFromEnv(env)) });
 
 const server = app.listen(env.PORT, () => {
-  console.log(`Server listening on http://localhost:${env.PORT} (${env.NODE_ENV})`);
+  const url = `http://localhost:${env.PORT}`;
+  console.log(
+    existsSync(CLIENT_DIST)
+      ? `Server listening on ${url}, serving the built app and the API.`
+      : `API listening on ${url}. The app itself is served by Vite (npm run dev).`,
+  );
 });
 
 // Graceful shutdown so in-flight requests can finish (e.g. when a container stops).
