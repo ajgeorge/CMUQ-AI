@@ -98,19 +98,23 @@ export function Guide({ onStart }: { onStart: () => void }) {
       <div className="guide__start">{start}</div>
 
       <GuideSection title="The four steps">
-        <ol className="guide__steps">
-          {STEPS.map((step) => (
-            <li key={step.name}>
-              <strong>{step.name}.</strong> {step.what}
+        <ol className="guide__steps guide__grid">
+          {STEPS.map((step, i) => (
+            <li key={step.name} className="guide__card">
+              <span className="guide__number" aria-hidden="true">
+                {i + 1}
+              </span>
+              <h3>{step.name}</h3>
+              <p>{step.what}</p>
             </li>
           ))}
         </ol>
       </GuideSection>
 
       <GuideSection title="Difficulty levels">
-        <ul className="guide__levels">
+        <ul className="guide__grid">
           {LEVELS.map((level) => (
-            <li key={level}>
+            <li key={level} className="guide__card">
               <DifficultyBadge level={level} />
               <p>{DIFFICULTY[level].description}</p>
             </li>
@@ -119,32 +123,34 @@ export function Guide({ onStart }: { onStart: () => void }) {
       </GuideSection>
 
       <GuideSection title="What the buttons do">
-        {BUTTONS.map(({ stage, buttons }) => (
-          <div key={stage} className="guide__stage">
-            <h3>{stage}</h3>
-            <dl>
-              {buttons.map(({ name, what }) => (
-                <div key={name} className="guide__button">
-                  <dt>{name}</dt>
-                  <dd>{what}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        ))}
+        <div className="guide__grid guide__grid--wide">
+          {BUTTONS.map(({ stage, buttons }) => (
+            <div key={stage} className="guide__card">
+              <h3>{stage}</h3>
+              <dl>
+                {buttons.map(({ name, what }) => (
+                  <div key={name} className="guide__button">
+                    <dt>{name}</dt>
+                    <dd>{what}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          ))}
+        </div>
       </GuideSection>
 
       <GuideSection title="Good to know">
-        <ul className="guide__notes">
-          <li>
+        <ul className="guide__grid">
+          <li className="guide__card">
             You can ask up to {CHAT_LIMITS.maxStudentTurns} questions, each up to{' '}
             {CHAT_LIMITS.maxStudentMessageChars} characters.
           </li>
-          <li>
+          <li className="guide__card">
             Your interview is kept if you refresh the page, but not once you close the tab. Download
             the feedback to keep it.
           </li>
-          <li>
+          <li className="guide__card">
             The client and the coach are AI. Whether a product you recommend suits the client comes
             from the bank&apos;s own rules, not from the AI; the coach&apos;s comments are its
             judgement, to learn from.

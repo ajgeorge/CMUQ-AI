@@ -1,4 +1,5 @@
-.guide {
+/* Uses the full page width, with cards side by side like the client list. */
+.guide .lead {
   max-width: 48rem;
 }
 
@@ -14,47 +15,57 @@
   margin-bottom: var(--space-3);
 }
 
-.guide__steps,
-.guide__notes {
-  margin: 0;
-  padding-left: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-/* Difficulty levels and button lists: one card each, like the rest of the app. */
-.guide__levels {
+/* Cards in a row on wide screens, stacked on phones. */
+.guide__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--space-3);
   margin: 0;
   padding: 0;
   list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
 }
 
-.guide__levels li,
-.guide__stage {
+/* The button lists are longer, so two per row. */
+.guide__grid--wide {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 30rem), 1fr));
+}
+
+.guide__card {
   padding: var(--space-3) var(--space-4);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
 }
 
-.guide__levels p {
-  margin: var(--space-1) 0 0;
-}
-
-.guide__stage + .guide__stage {
-  margin-top: var(--space-3);
-}
-
-.guide__stage h3 {
+.guide__card h3 {
   margin: 0 0 var(--space-2);
   font-size: 1.0625rem;
 }
 
-.guide__stage dl {
+.guide__card p {
+  margin: var(--space-2) 0 0;
+}
+
+.guide__steps .guide__card p {
+  margin-top: 0;
+}
+
+/* The step number, styled like the progress bar. */
+.guide__number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin-bottom: var(--space-2);
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+.guide__card dl {
   margin: 0;
   display: flex;
   flex-direction: column;
@@ -70,11 +81,11 @@
   color: var(--color-text-muted);
 }
 
-/* Side by side on wide screens: the button name, then what it does. */
+/* Inside a wide card: the button name, then what it does, side by side. */
 @media (min-width: 40rem) {
   .guide__button {
     display: grid;
-    grid-template-columns: 14rem 1fr;
+    grid-template-columns: 11rem 1fr;
     gap: var(--space-3);
   }
 }
