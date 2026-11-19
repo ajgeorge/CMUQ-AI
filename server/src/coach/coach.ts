@@ -36,9 +36,21 @@ export async function getFeedback(ai: Ai, input: CoachInput): Promise<FeedbackRe
   ];
   const needIds = input.client.needs.map((need) => need.id);
   const productsNamed = input.discussedProducts.map((product) => product.name);
-  const check = (text: string) => checkCoachReply(text, needIds, productsNamed);
+  // Asks the coach and checks the reply. A reply the provider itself rejected as invalid
+  // JSON (in JSON mode) gets the same second chance as one the app rejects.
+  const ask = async (conversation: AiMessage[]): Promise<Checked> => {
+    try {
+      const { text } = await ai.generate('coach', conversation);
+      return checkCoachReply(text, needIds, productsNamed);
+    } catch (err) {
+      if (err instanceof AiError && err.code === 'AI_BAD_RESPONSE') {
+        return { ok: false, problems: ['the reply was not valid JSON'] };
+      }
+      throw err;
+    }
+  };
 
-  let checked = check((await ai.generate('coach', messages)).text);
+  let checked = await ask(messages);
   if (!checked.ok) {
     // Only the problems are logged: the reply may quote the student's interview.
     console.warn(
@@ -53,7 +65,7 @@ export async function getFeedback(ai: Ai, input: CoachInput): Promise<FeedbackRe
           'Reply again with the complete JSON in exactly the required shape.',
       },
     ];
-    checked = check((await ai.generate('coach', retry)).text);
+    checked = await ask(retry);
     if (!checked.ok) {
       throw new AiError(
         'AI_BAD_RESPONSE',
