@@ -20,7 +20,15 @@ app's own "Download as Markdown" button and has not been edited.
 ## Quick start
 
 You need **Node.js 22.12 or newer** and an API key for an OpenAI-compatible provider. A free
-[Groq](https://console.groq.com/keys) key works.
+Groq key works:
+
+1. Sign in or create a free account at [console.groq.com](https://console.groq.com).
+2. Open **API Keys** ([console.groq.com/keys](https://console.groq.com/keys)) and create a new
+   key.
+3. Copy the key, which starts with `gsk_`, straight away, as you may not be able to see it
+   again. You'll paste it into the `.env` file in the next step.
+
+Then:
 
 ```bash
 npm install
