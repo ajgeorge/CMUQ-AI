@@ -29,6 +29,8 @@ npm run check:ai          # confirms the key and that every model works
 npm run dev               # open http://localhost:5173
 ```
 
+In the Windows Command Prompt, use `copy .env.example .env` instead of `cp`.
+
 To run it as a single server instead:
 
 ```bash
