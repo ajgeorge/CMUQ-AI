@@ -9,9 +9,13 @@ import { StepIndicator } from './components/StepIndicator';
 import { SummaryForm } from './components/SummaryForm';
 import { loadSession, saveSession } from './session';
 import { initialState, limitReached, reducer, type Action, type AppState } from './state';
+import { useMediaQuery } from './use-media-query';
 import './App.css';
 
 const APP_NAME = 'Bank Client Discovery Simulator';
+
+/** Where the products panel moves beside the chat (the same width as in App.css). */
+const WIDE_SCREEN = '(min-width: 60rem)';
 
 interface Catalogue {
   bank: Bank;
@@ -71,7 +75,9 @@ export function App() {
   }
 
   function getFeedback() {
-    if (state.step === 'feedback') requestFeedback(state.client.id, state.messages, state.summary);
+    if (state.step !== 'feedback') return;
+    setNavigated(true);
+    requestFeedback(state.client.id, state.messages, state.summary);
   }
 
   // Bumped by "Try again" to load the data once more.
@@ -102,6 +108,8 @@ export function App() {
   }, [ready, state]);
 
   function retry() {
+    // The "Try again" button is about to disappear: focus the heading of what loads instead.
+    setNavigated(true);
     setLoading({ status: 'loading' });
     setAttempt((n) => n + 1);
   }
@@ -160,8 +168,13 @@ interface ScreenProps {
 function Screen(props: ScreenProps) {
   const { state, data, dispatch, focusHeading, coach, onGetFeedback } = props;
   const title = screenTitle(state);
-  // Keyed by step so each screen gets a fresh heading that takes focus when it appears.
-  const heading = <Heading key={state.step} title={title} focus={focusHeading} />;
+  const wide = useMediaQuery(WIDE_SCREEN);
+  // Keyed so each new screen gets a fresh heading that takes focus when it appears. On the
+  // feedback screen that includes each change of content (waiting, failed, report ready):
+  // the button just pressed disappears, so focus would otherwise drop to the top of the page.
+  const screenKey =
+    state.step === 'feedback' ? `feedback-${state.feedback ? 'ready' : coach.status}` : state.step;
+  const heading = <Heading key={screenKey} title={title} focus={focusHeading} />;
 
   switch (state.step) {
     case 'select':
@@ -179,7 +192,18 @@ function Screen(props: ScreenProps) {
         </>
       );
 
-    case 'interview':
+    case 'interview': {
+      const chat = (
+        <InterviewChat
+          key="chat"
+          client={state.client}
+          messages={state.messages}
+          onExchange={(question, reply) => dispatch({ type: 'exchange', question, reply })}
+          onEnd={() => dispatch({ type: 'endInterview' })}
+          onLeave={() => dispatch({ type: 'restart' })}
+        />
+      );
+      const products = <ProductPanel key="products" products={data.products} />;
       return (
         <>
           {heading}
@@ -187,18 +211,13 @@ function Screen(props: ScreenProps) {
             {state.client.occupation} · {capitalise(state.client.difficulty)}. Ask questions to
             understand their situation. The product list has the details you can share.
           </p>
-          <div className="interview-layout">
-            <InterviewChat
-              client={state.client}
-              messages={state.messages}
-              onExchange={(question, reply) => dispatch({ type: 'exchange', question, reply })}
-              onEnd={() => dispatch({ type: 'endInterview' })}
-              onLeave={() => dispatch({ type: 'restart' })}
-            />
-            <ProductPanel products={data.products} />
-          </div>
+          {/* Beside the chat on wide screens, above it on narrow ones. The page order
+              follows what is on screen, so the keyboard moves through it in the order
+              it is seen. Keyed, so switching layout moves them rather than resetting them. */}
+          <div className="interview-layout">{wide ? [chat, products] : [products, chat]}</div>
         </>
       );
+    }
 
     case 'summary':
       return (
@@ -221,10 +240,20 @@ function Screen(props: ScreenProps) {
         </>
       );
 
-    case 'feedback':
+    case 'feedback': {
+      const waiting = !state.feedback && coach.status === 'waiting';
       return (
         <>
           {heading}
+          {/* Stays on the page for the whole step, so screen readers reliably announce
+              each change, including when the report arrives. */}
+          <p role="status" className={waiting ? 'lead' : 'visually-hidden'}>
+            {waiting
+              ? 'The coach is reviewing your interview. This usually takes a few seconds…'
+              : state.feedback
+                ? 'Your feedback is ready.'
+                : ''}
+          </p>
           {state.feedback ? (
             <FeedbackReport
               client={state.client}
@@ -235,11 +264,7 @@ function Screen(props: ScreenProps) {
               onRestart={() => dispatch({ type: 'restart' })}
               onRetryClient={() => dispatch({ type: 'start', client: state.client })}
             />
-          ) : coach.status === 'waiting' ? (
-            <p role="status" className="lead">
-              The coach is reviewing your interview. This usually takes a few seconds…
-            </p>
-          ) : (
+          ) : waiting ? null : (
             <div
               role={coach.status === 'failed' ? 'alert' : undefined}
               className={`alert ${coach.status === 'failed' ? 'alert--error' : 'alert--info'}`}
@@ -265,6 +290,7 @@ function Screen(props: ScreenProps) {
           )}
         </>
       );
+    }
   }
 }
 

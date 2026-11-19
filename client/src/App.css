@@ -27,10 +27,3 @@
     grid-template-columns: minmax(0, 1fr) 22rem;
   }
 }
-
-/* On narrow screens the "Show products" toggle sits above the chat. */
-@media (max-width: 59.99rem) {
-  .interview-layout .products {
-    order: -1;
-  }
-}
