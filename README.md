@@ -220,9 +220,13 @@ real deployment would add, is set out separately below.
 - **The real limit is the provider.** On Groq's free tier the client model's daily allowance
   runs out first, at about a dozen full interviews; the coach's lasts for about 30 reviews. The
   backup models extend that, and a paid tier raises the limits by orders of magnitude.
-- **The biggest saving available:** the client's instructions are identical on every call and
-  come first in the prompt, so a provider with prompt caching can reuse them at a lower price.
-  For long interviews, older turns could also be summarised instead of resent in full.
+- **Prompt caching is the first thing to consider at scale.** About half of an interview's
+  tokens are the client's instructions, resent unchanged with every question. They already
+  come first in the prompt, which is what a provider's prompt caching needs to reuse them at a
+  lower price, but caching hasn't been set up or measured here because of the limits of the
+  free-tier models and their daily quotas. For long interviews, older turns could also be
+  summarised instead of resent in full, at the risk of the client forgetting what it has
+  already said.
 - **A real deployment would add:** per-user rate limits, budget alerts on a paid tier, a shared
   store for the rate-limit timer, and persistent metrics (for example OpenTelemetry).
 
