@@ -35,8 +35,10 @@ export async function getFeedback(ai: Ai, input: CoachInput): Promise<FeedbackRe
     { role: 'user', content: buildCoachData(input) },
   ];
   const needIds = input.client.needs.map((need) => need.id);
+  const productsNamed = input.discussedProducts.map((product) => product.name);
+  const check = (text: string) => checkCoachReply(text, needIds, productsNamed);
 
-  let checked = checkCoachReply((await ai.generate('coach', messages)).text, needIds);
+  let checked = check((await ai.generate('coach', messages)).text);
   if (!checked.ok) {
     // Only the problems are logged: the reply may quote the student's interview.
     console.warn(
@@ -51,7 +53,7 @@ export async function getFeedback(ai: Ai, input: CoachInput): Promise<FeedbackRe
           'Reply again with the complete JSON in exactly the required shape.',
       },
     ];
-    checked = checkCoachReply((await ai.generate('coach', retry)).text, needIds);
+    checked = check((await ai.generate('coach', retry)).text);
     if (!checked.ok) {
       throw new AiError(
         'AI_BAD_RESPONSE',
@@ -68,8 +70,16 @@ export async function getFeedback(ai: Ai, input: CoachInput): Promise<FeedbackRe
   });
 }
 
-/** Parses the coach's reply and checks it has the right shape and covers every need once. */
-export function checkCoachReply(text: string, needIds: string[]): Checked {
+/**
+ * Parses the coach's reply and checks it has the right shape, covers every need once, and
+ * doesn't contradict what the app knows about the interview.
+ */
+export function checkCoachReply(
+  text: string,
+  needIds: string[],
+  /** Products the student named while talking to the client. */
+  productsNamed: string[] = [],
+): Checked {
   let json: unknown;
   try {
     json = JSON.parse(text);
@@ -95,6 +105,14 @@ export function checkCoachReply(text: string, needIds: string[]): Checked {
   if (missing.length) problems.push(`"needs" is missing: ${missing.join(', ')}`);
   if (unknown.length) problems.push(`"needs" has unknown ids: ${unknown.join(', ')}`);
   if (repeated.length) problems.push(`"needs" repeats: ${repeated.join(', ')}`);
+  // "No product details given" can't be right when the student named products to the client.
+  // (The opposite, "accurate" with nothing named, is corrected in toFeedback.)
+  if (parsed.data.productAccuracy.status === 'no-claims' && productsNamed.length > 0) {
+    problems.push(
+      `"productAccuracy" is "no-claims", but the student told the client about ` +
+        `${productsNamed.join(', ')}: check what they said and use "accurate" or "issues"`,
+    );
+  }
 
   return problems.length ? { ok: false, problems } : { ok: true, output: parsed.data };
 }
