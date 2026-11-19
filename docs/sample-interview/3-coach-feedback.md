@@ -12,24 +12,47 @@ You fully uncovered 3 of Ahmed's 4 needs.
 
 ### What went well
 
-- You used open‑ended questions that let the client explain his cash‑flow challenge, Sharia requirement and growth plans.
-- You linked each identified need to a suitable product before making any recommendation.
-- You avoided suggesting any non‑Sharia‑compliant financing, respecting his core preference.
+- You prioritized discovery by asking about financial challenges and product requirements before suggesting any solutions.
+- You correctly identified that the client's expansion needs required a breakdown of costs, distinguishing between equipment and fit-out.
+- Your summary accurately reflected the client's stated needs and the rationale behind your recommendations.
 
 ### What was missed
 
-- You did not explore the client’s frustration with his current bank in depth, missing an opportunity to highlight our superior service.
-- You only suggested Ijara Equipment Finance, which does not cover the QAR 600 k fit‑out, leaving a gap in the financing plan.
-- You did not ask about the timeline or urgency for the equipment purchase, which could affect product structuring.
+- You did not explicitly probe the client's dissatisfaction with his current bank's service, missing a key driver for switching to the Tijara account.
+- You recommended Ijara Equipment Finance without fully addressing the QAR 600,000 fit-out cost, which Ijara does not cover, leaving a gap in the financing plan for the second kitchen.
 
 ### How to improve
 
-- Probe the client’s experience with his current bank to understand specific service gaps.  
-  Try asking: "Can you tell me about any challenges you face with your current bank’s service, such as response times or needing to visit a branch?"
-- Clarify the full funding requirement for the second kitchen, including fit‑out costs, to propose a comprehensive solution.  
-  Try asking: "Besides the equipment, how do you plan to finance the fit‑out and renovation portion of the QAR 1.5 million?"
-- Ask about the desired timeline for the equipment purchase so you can match the financing term appropriately.  
-  Try asking: "When do you need the kitchen equipment in place, and how does that affect your financing schedule?"
+- Ask specifically about the client's current banking experience to identify pain points that your products can solve.  
+  Try asking: "How is your current banking relationship working for you, and are there any areas where you feel you're not getting the service you need?"
+- When recommending financing for a project with multiple cost components, explicitly address how each component will be funded, especially if a product only covers part of it.  
+  Try asking: "Since Ijara covers the equipment, how are you planning to fund the QAR 600,000 for the fit-out and renovation?"
+
+### Key moments in the interview
+
+#### ✓ Strong question
+
+> **Student:** Okay, so could you tell me right now what is the **biggest financial challenge** you're facing in your business right now?
+
+This open question effectively uncovered the critical cash-flow gap without leading the client.
+
+#### ✓ Strong question
+
+> **Student:** Before I suggest anything, are there any **requirements the products need to meet**, for example perhaps islamic banking?
+
+Asking about requirements before suggesting products showed respect for the client's preferences and prevented recommending unsuitable options.
+
+#### ⚑ Recommended too early
+
+> **Student:** Alright, based on everything you have mentioned, **One option for the cash-flow gap** is our Islamic Receivables Finance. It advances up to 80% of approved invoices, it's Sharia-compliant with a fixed profit agreed upfront, and it needs a Tijara Business Account with us. How does that sound?
+
+While you had discovered the need, jumping to a specific product recommendation before fully exploring the client's current banking frustrations was slightly premature.
+
+#### ◐ Missed cue
+
+> **Ahmed:** That sounds manageable. I have the last three years of audited statements ready, so I can send those over immediately. I’m happy to move my main business account to you if the **service is better, which it needs to be**. Please let me know what the next step is.
+
+The client hinted at dissatisfaction with current service, but you did not follow up to ask specifically what was lacking, missing a chance to highlight the Tijara account's digital advantages.
 
 ### What Ahmed needed
 
@@ -39,7 +62,7 @@ Corporate clients usually pay invoices 60 to 90 days after the event, but he has
 
 You asked: "Okay, so could you tell me right now what is the biggest financial challenge you're facing in your business right now?"
 
-Your question uncovered the timing issue and the cash‑flow gap clearly, giving you the key facts needed.
+You asked the right open question to uncover the timing mismatch. The client revealed the 60-90 day payment delay versus 30-day costs, and you captured the specific pain points of delayed supplier payments and using personal savings.
 
 #### Only uses Sharia-compliant products: ✓ Found (critical need)
 
@@ -47,7 +70,7 @@ He will only use Sharia-compliant banking and financing. Last year he turned dow
 
 You asked: "Before I suggest anything, are there any requirements the products need to meet, for example perhaps islamic banking?"
 
-The client directly stated his firm requirement for Sharia‑compliant products, so you captured this critical need.
+This was a crucial question to ask before discussing products. It allowed the client to state his firm requirement for Sharia compliance, which filtered out unsuitable options like the conventional overdraft.
 
 #### Plans to open a second kitchen: ✓ Found
 
@@ -55,13 +78,13 @@ Plans to open a second central kitchen in Al Wakrah within 12 months. He needs a
 
 You asked: "Alright that won't be an issue with us. Where do you see the business in the next year or two?"
 
-This opened the discussion about the new kitchen and the QAR 1.5 million funding requirement.
+You successfully identified the expansion plan and the total budget. You also followed up to break down the costs into equipment and fit-out, which is essential for selecting the right financing product.
 
 #### Frustrated with his current bank: ◐ Partly found
 
 Currently banks elsewhere and is frustrated by slow responses and having to visit a branch for simple tasks. He would move his business account for better service.
 
-The client hinted at dissatisfaction with his current bank, but you didn’t probe the specific pain points such as slow responses or branch visits.
+The client mentioned being open to moving accounts if service is better, but you did not ask directly about his current banking experience or specific frustrations. You missed the opportunity to explicitly validate his dissatisfaction with slow responses and branch visits, which would have strengthened the case for the Tijara account's digital features.
 
 ### Recommendations
 
@@ -71,4 +94,4 @@ The client hinted at dissatisfaction with his current bank, but you didn’t pro
 
 ### Accuracy of product information
 
-✓ Accurate. All product details you shared – Tijara Business Account features, Islamic Receivables Finance terms, and the mention of Ijara Equipment Finance – align with the bank’s product specifications.
+✓ Accurate. All product details you shared with the client were correct, including the Sharia compliance, fee structures, and eligibility requirements for the Tijara account and Islamic Receivables Finance.
