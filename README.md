@@ -69,16 +69,14 @@ Tested on **Groq** (free tier):
 | AI coach        | `openai/gpt-oss-120b` | Reliable structured (JSON) output and careful judgement. A review takes about 3 to 4 seconds.                                                                                              |
 | Backup for both | `openai/gpt-oss-20b`  | Has its own usage allowance on Groq. It passed the same coach checks as the main coach model; as the client it is a little less natural than qwen, but better than an error mid-interview. |
 
-**Free-tier limits.** Groq's free tier gives each model 8,000 tokens per minute, and
-gpt-oss-120b 200,000 tokens per day. One coach review uses about 4,500 to 7,000 tokens,
-depending on the length of the interview, so the coach model alone allows about one review a
-minute and 30 to 40 a day. With the backup model set, the next reviews go to the backup when
-either limit is reached, so students don't see an error. A typical interview is well within
-the per-request limit, but one that uses all 30 questions with very long messages and summary
-can need around 10,000 tokens for a single review, more than the free tier allows in one
-request. The app then explains that the interview is too
-long for the current usage limits instead of failing silently. A paid tier raises these
-limits.
+**Free-tier limits.** Groq's free tier gives each model 8,000 tokens per minute and 200,000
+per day. That is enough for about a dozen full interviews a day on the main models (see
+"Operating the AI" below); with the backup model set, calls move to the backup when a limit is
+reached, so students don't see an error. A typical interview is well within the per-request
+limit, but one that uses all 30 questions with very long messages and summary can need around
+10,000 tokens for a single review, more than the free tier allows in one request. The app
+then explains that the interview is too long for the current usage limits instead of failing
+silently. A paid tier raises these limits.
 
 ## How it works
 
@@ -181,6 +179,52 @@ checks in both roles before it was suggested.
   interview as a Markdown file instead.
 - **Production hardening** such as security headers, rate limiting and deployment. See
   "Limitations" below.
+
+## Operating the AI: cost, monitoring and scaling
+
+This is a prototype, so it doesn't include a metrics system. What it does today, and what a
+real deployment would add, is set out separately below.
+
+### Cost
+
+- **Every AI call is logged** with its role, model, outcome, response time, tokens in and out,
+  the provider's remaining allowance for the minute, and why the backup answered when it did.
+  Cost is tokens multiplied by the provider's price, so the cost of any period can be worked
+  out from the log.
+- **A typical interview uses about 21,000 tokens.** The sample interview (9 questions) takes
+  about 15,000 for the client's replies and 5,500 to 7,000 for the coach's review. Most of it
+  is input: the server keeps nothing between requests, so each question resends the client's
+  instructions (about 1,100 to 1,200 tokens) and the conversation so far.
+- **Every interview has a ceiling.** The limits in the code (30 questions, 16,000 characters of
+  conversation, short client replies, at most one regeneration per reply, one review with at
+  most one retry) cap a single interview at about 350,000 tokens in the very worst case. Real
+  interviews come nowhere near that, but no interview can run up an open-ended bill.
+
+### Watching the model
+
+- **The checks described above** (out-of-character replies, the coach's JSON and needs list,
+  evidence and key-moment quotes, the product accuracy rules) catch the model's mistakes before
+  the student sees them.
+- **What gets logged:** the client breaking character (and whether the fallback line was used),
+  the coach's reply being sent back and why, every failed call by type, and every switch to a
+  backup model. The quote checks and the accuracy rules correct the output without logging it.
+- **A real deployment would add:** counts of how often each check fires, with alerts when a rate
+  rises (the first sign of a model drifting or a prompt change making things worse); a prompt
+  version recorded with each call, to tie a change in quality to a change in prompt; and daily
+  spending caps.
+
+### Scaling
+
+- **The server is stateless,** so several copies can run behind a load balancer. The only
+  shared state would be the timer that skips a rate-limited model, which today is per server.
+- **The real limit is the provider.** On Groq's free tier the client model's daily allowance
+  runs out first, at about a dozen full interviews; the coach's lasts for about 30 reviews. The
+  backup models extend that, and a paid tier raises the limits by orders of magnitude.
+- **The biggest saving available:** the client's instructions are identical on every call and
+  come first in the prompt, so a provider with prompt caching can reuse them at a lower price.
+  For long interviews, older turns could also be summarised instead of resent in full.
+- **A real deployment would add:** per-user rate limits, budget alerts on a paid tier, a shared
+  store for the rate-limit timer, and persistent metrics (for example OpenTelemetry).
 
 ## Accessibility (WCAG 2.1 AA)
 
