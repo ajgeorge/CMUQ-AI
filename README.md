@@ -269,6 +269,9 @@ touching code, and the server checks them when it starts and says exactly what t
 - **The browser holds the transcript,** so a student could edit it before asking for feedback.
   That's acceptable for practice, but graded use would need the server to keep the
   conversation.
+- **Content is edited in files, not in the app.** This is deliberate: with no login, an editing
+  page would be open to everyone, students included, and would expose the hidden needs and
+  answer keys. With accounts, an instructor-only editor would be the natural next step.
 - **Possible next steps:** saving interviews across devices, an instructor view of progress,
   integration with the learning platform (LTI), and voice input for more realistic practice.
 
