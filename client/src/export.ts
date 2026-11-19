@@ -8,6 +8,7 @@ import type {
 import {
   ACCURACY,
   FIT,
+  MOMENT,
   NEED_STATUS,
   firstNameOf,
   needsFoundLine,
@@ -87,9 +88,24 @@ export function toMarkdown(record: InterviewRecord): string {
         `- ${inline(advice)}` +
         (exampleQuestion ? `  \n  Try asking: "${inline(exampleQuestion)}"` : ''),
     ),
-    '',
-    `### What ${firstName} needed`,
   );
+
+  if (feedback.moments.length > 0) {
+    lines.push('', '### Key moments in the interview');
+    for (const moment of feedback.moments) {
+      const speaker = moment.speaker === 'client' ? firstName : 'Student';
+      lines.push(
+        '',
+        `#### ${badge(MOMENT[moment.type])}`,
+        '',
+        `> **${speaker}:** ${inline(emphasise(moment.message, moment.quote))}`,
+        '',
+        inline(moment.note),
+      );
+    }
+  }
+
+  lines.push('', `### What ${firstName} needed`);
 
   for (const need of feedback.needs) {
     const critical = need.importance === 'critical' ? ' (critical need)' : '';
@@ -144,6 +160,13 @@ export function downloadMarkdown(record: InterviewRecord): void {
 
 function longDate(date: Date): string {
   return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+/** Puts the words a key moment points at in bold, as the page highlights them. */
+function emphasise(message: string, quote: string): string {
+  const at = message.indexOf(quote);
+  if (at < 0) return message;
+  return `${message.slice(0, at)}**${quote}**${message.slice(at + quote.length)}`;
 }
 
 /** Text on one line or list item: keeps the student's line breaks as Markdown breaks. */

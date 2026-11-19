@@ -20,6 +20,7 @@ const products = [
 ] as Product[];
 
 const feedback: FeedbackResponse = {
+  moments: [],
   needs: [
     {
       id: 'cash-flow-gap',

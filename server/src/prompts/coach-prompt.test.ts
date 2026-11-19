@@ -59,10 +59,10 @@ describe('buildCoachData', () => {
     expect(text).toContain(`Islamic Receivables Finance: ${ahmed.productFit.suitable[0]?.reason}`);
   });
 
-  it('labels the transcript, starting with the opening line, and includes the summary', () => {
+  it('numbers the transcript, starting with the opening line, and includes the summary', () => {
     const text = data();
     expect(text).toContain(
-      `CLIENT: ${ahmed.profile.openingLine}\nSTUDENT: What is your biggest challenge?\nCLIENT: Clients pay late.`,
+      `[0] CLIENT: ${ahmed.profile.openingLine}\n[1] STUDENT: What is your biggest challenge?\n[2] CLIENT: Clients pay late.`,
     );
     expect(text).toContain('Needs identified: Cash flow gap.');
     expect(text).toContain('Recommended: Business Flex Overdraft');

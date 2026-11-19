@@ -1,4 +1,4 @@
-import type { FeedbackResponse, FitRating, NeedStatus } from '@bank-sim/shared';
+import type { FeedbackResponse, FitRating, MomentType, NeedStatus } from '@bank-sim/shared';
 
 /*
  * The words used for each verdict on the feedback page and in the downloaded copy,
@@ -30,6 +30,13 @@ export const ACCURACY: Record<FeedbackResponse['productAccuracy']['status'], Lab
   accurate: { label: 'Accurate', symbol: '✓', tone: 'good' },
   issues: { label: 'Some information was wrong', symbol: '✗', tone: 'bad' },
   'no-claims': { label: 'No product details given', symbol: '–', tone: 'neutral' },
+};
+
+export const MOMENT: Record<MomentType, Label> = {
+  'strong-question': { label: 'Strong question', symbol: '✓', tone: 'good' },
+  'missed-cue': { label: 'Missed cue', symbol: '◐', tone: 'mixed' },
+  'inaccurate-claim': { label: 'Inaccurate claim', symbol: '✗', tone: 'bad' },
+  'early-recommendation': { label: 'Recommended too early', symbol: '⚑', tone: 'mixed' },
 };
 
 /** Shown for a recommended product that isn't in the client's answer key. */

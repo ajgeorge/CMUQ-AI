@@ -1,9 +1,12 @@
 import {
+  CoachMomentSchema,
   CoachOutputSchema,
   type ChatMessage,
   type Client,
   type CoachOutput,
   type FeedbackResponse,
+  type KeyMoment,
+  type MomentType,
   type NeedFeedback,
   type ProductFitResult,
 } from '@bank-sim/shared';
@@ -128,8 +131,15 @@ export function toFeedback(
     };
   });
 
+  // The conversation as numbered in the coach's transcript: 0 is the opening line.
+  const turns: ChatMessage[] = [
+    { role: 'client', content: client.profile.openingLine },
+    ...messages,
+  ];
+
   return {
     needs,
+    moments: checkMoments(output.moments, turns),
     productFit: fit,
     wentWell: output.wentWell,
     missed: output.missed,
@@ -141,6 +151,81 @@ export function toFeedback(
         ? { status: 'no-claims', comment: NO_CLAIMS_COMMENT }
         : output.productAccuracy,
   };
+}
+
+/** Whose turn each kind of key moment is about. */
+const MOMENT_SPEAKER: Record<MomentType, ChatMessage['role']> = {
+  'strong-question': 'student',
+  'missed-cue': 'client',
+  'inaccurate-claim': 'student',
+  'early-recommendation': 'student',
+};
+
+const MAX_MOMENTS = 6;
+
+/**
+ * Checks the coach's key moments against the transcript. Each quote must really appear in
+ * a turn by the right speaker. If the coach's turn number is off, the turn the quote comes
+ * from is used instead; anything that can't be placed, or is malformed, is dropped.
+ */
+export function checkMoments(raw: unknown[] | undefined, turns: ChatMessage[]): KeyMoment[] {
+  const placed = new Map<string, KeyMoment>();
+
+  for (const item of raw ?? []) {
+    const parsed = CoachMomentSchema.safeParse(item);
+    if (!parsed.success) continue;
+    const { turn, type, quote, note } = parsed.data;
+    const speaker = MOMENT_SPEAKER[type];
+
+    // The turn the coach gave first, then every other turn by the right speaker.
+    const candidates = [turn, ...turns.keys()].filter((i) => turns[i]?.role === speaker);
+    for (const i of candidates) {
+      const message = turns[i]!.content;
+      const exact = locate(quote, message);
+      if (exact) {
+        const key = `${i}:${type}`;
+        if (!placed.has(key))
+          placed.set(key, { turn: i, speaker, type, message, quote: exact, note });
+        break;
+      }
+    }
+  }
+
+  return [...placed.values()].sort((a, b) => a.turn - b.turn).slice(0, MAX_MOMENTS);
+}
+
+/**
+ * Finds a quote in a message, ignoring case, spacing and punctuation, and returns the
+ * matching words exactly as they appear in the message (so they can be highlighted).
+ */
+export function locate(quote: string, message: string): string | null {
+  const wanted = normalise(quote);
+  if (wanted.length < 8) return null; // too short to place reliably
+
+  // The message normalised the same way, remembering where each character came from.
+  let text = '';
+  const from: number[] = [];
+  for (let i = 0; i < message.length; i++) {
+    const char = message[i]!;
+    if (/[\p{L}\p{N}]/u.test(char)) {
+      for (const lower of char.toLowerCase()) {
+        text += lower;
+        from.push(i);
+      }
+    } else if (text && !text.endsWith(' ')) {
+      text += ' ';
+      from.push(i);
+    }
+  }
+
+  // Whole words only, so "fee" doesn't match inside "coffee".
+  for (let at = text.indexOf(wanted); at >= 0; at = text.indexOf(wanted, at + 1)) {
+    const end = at + wanted.length;
+    if ((at === 0 || text[at - 1] === ' ') && (end === text.length || text[end] === ' ')) {
+      return message.slice(from[at], from[end - 1]! + 1);
+    }
+  }
+  return null;
 }
 
 /** The student's question containing the quote, ignoring case, spacing and punctuation. */

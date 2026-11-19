@@ -48,6 +48,12 @@ HOW TO ASSESS
 3. Product accuracy. Compare everything the student told the client about products (Sharia compliance, features, rates, fees, limits, eligibility) with the product details. If anything was wrong or misleading, quote it and give the correct information. Use "accurate" if everything said was correct, "issues" if anything was wrong, and "no-claims" if the student did not describe any products to the client during the interview. Only what the student said to the client counts, not the summary. For "no-claims", say so in one sentence; problems with the recommendations belong under "missed".
 4. The summary. Check it matches what the client actually said, and point out needs it claims that the client never mentioned.
 5. Questioning technique: open and closed questions, follow-ups, listening, and whether the student recommended products before understanding the client.
+6. Key moments: pick up to 6 turns that taught the most (fewer is fine). For each, give its turn number from the transcript (the number in square brackets), a quote of a few words copied exactly from that turn, and a note of 1 to 2 sentences on why it mattered. Use these types:
+   - "strong-question": a STUDENT turn with a well-chosen question.
+   - "missed-cue": a CLIENT turn that hinted at one of the client's needs, which the student's next questions did not follow up. Quote the words of the hint itself.
+   - "inaccurate-claim": a STUDENT turn that said something wrong about a product. Always include these.
+   - "early-recommendation": a STUDENT turn that recommended a product before understanding the client's needs.
+   Only include moments that really happened. Use "missed-cue", "inaccurate-claim" or "early-recommendation" only when it really was a mistake; if it was fine, leave it out.
 
 TONE
 - Write to the student as "you", like a supportive mentor.
@@ -64,12 +70,14 @@ REPLY WITH JSON ONLY, in exactly this shape:
   "wentWell": ["<point>"],
   "missed": ["<point>"],
   "improve": [{ "advice": "<what to do differently>", "exampleQuestion": "<a question they could ask>" | null }],
-  "productAccuracy": { "status": "accurate" | "issues" | "no-claims", "comment": "<explanation>" }
+  "productAccuracy": { "status": "accurate" | "issues" | "no-claims", "comment": "<explanation>" },
+  "moments": [{ "turn": <number>, "type": "strong-question" | "missed-cue" | "inaccurate-claim" | "early-recommendation", "quote": "<a few words copied from that turn>", "note": "<why it mattered>" }]
 }
 - "needs": exactly one entry for every hidden need, in the order given, using its id.
 - "wentWell": 2 to 4 points.
 - "missed": up to 4 points, most important first: missed critical needs, unsuitable recommendations, wrong product information. Empty only if nothing important was missed.
 - "improve": 2 to 4 items. Give an example question when the advice is about asking something.
+- "moments": up to 6 items, in transcript order.
 - Keep every point and comment to 1 to 3 sentences.`;
 }
 
@@ -104,9 +112,12 @@ export function buildCoachData(input: CoachInput): string {
           .join('\n')
       : '- None';
 
+  // Numbered so the coach can point at a turn: [0] is the client's opening line.
   const transcript = [
-    `CLIENT: ${profile.openingLine}`,
-    ...messages.map((m) => `${m.role === 'student' ? 'STUDENT' : 'CLIENT'}: ${m.content}`),
+    `[0] CLIENT: ${profile.openingLine}`,
+    ...messages.map(
+      (m, i) => `[${i + 1}] ${m.role === 'student' ? 'STUDENT' : 'CLIENT'}: ${m.content}`,
+    ),
   ].join('\n');
 
   return `CLIENT

@@ -250,8 +250,30 @@ export const CoachOutputSchema = z.object({
     status: z.enum(['accurate', 'issues', 'no-claims']),
     comment: coachText,
   }),
+  /**
+   * Key moments, checked one by one with CoachMomentSchema (and against the transcript)
+   * so that one bad moment can't make the whole review unusable.
+   */
+  moments: z.array(z.unknown()).optional(),
 });
 export type CoachOutput = z.infer<typeof CoachOutputSchema>;
+
+/** Kinds of key moment the coach can point out, and whose turn each one is about. */
+export const MomentTypeSchema = z.enum([
+  'strong-question',
+  'missed-cue',
+  'inaccurate-claim',
+  'early-recommendation',
+]);
+export type MomentType = z.infer<typeof MomentTypeSchema>;
+
+/** A key moment as the coach writes it: a turn number from the transcript and a quote. */
+export const CoachMomentSchema = z.object({
+  turn: z.number().int(),
+  type: MomentTypeSchema,
+  quote: z.string().trim(),
+  note: coachText,
+});
 
 /** How a product fits the client, from the client's answer key (not decided by the AI). */
 export const FitRatingSchema = z.enum(['suitable', 'acceptable', 'unsuitable', 'not-relevant']);
@@ -284,8 +306,23 @@ export type NeedFeedback = z.infer<typeof NeedFeedbackSchema>;
  * Response of POST /api/feedback. A schema rather than only a type so the browser can
  * check a copy it saved earlier (see client/src/session.ts).
  */
+/** A key moment after checking: the full message, and the exact words it points at. */
+export const KeyMomentSchema = z.object({
+  /** 0 is the client's opening line; n is the n-th message after it. */
+  turn: z.number().int(),
+  speaker: z.enum(['student', 'client']),
+  type: MomentTypeSchema,
+  message: z.string(),
+  /** Copied from `message`, so it can be highlighted there. */
+  quote: z.string(),
+  note: z.string(),
+});
+export type KeyMoment = z.infer<typeof KeyMomentSchema>;
+
 export const FeedbackResponseSchema = z.object({
   needs: z.array(NeedFeedbackSchema),
+  /** In conversation order. Defaults to none for interviews saved before moments existed. */
+  moments: z.array(KeyMomentSchema).default([]),
   productFit: ProductFitResultSchema,
   wentWell: z.array(z.string()),
   missed: z.array(z.string()),

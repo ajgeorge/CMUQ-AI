@@ -3,6 +3,7 @@ import type {
   ChatMessage,
   FeedbackResponse,
   InterviewSummary,
+  KeyMoment,
   NeedFeedback,
   Product,
   PublicClient,
@@ -11,6 +12,7 @@ import { downloadMarkdown } from '../export';
 import {
   ACCURACY,
   FIT,
+  MOMENT,
   NEED_STATUS,
   firstNameOf,
   needsFoundLine,
@@ -76,6 +78,20 @@ export function FeedbackReport(props: Props) {
           ))}
         </ul>
       </Section>
+
+      {feedback.moments.length > 0 && (
+        <Section title="Key moments in your interview">
+          <ol className="feedback__moments">
+            {feedback.moments.map((moment) => (
+              <Moment
+                key={`${moment.turn}-${moment.type}`}
+                moment={moment}
+                author={moment.speaker === 'client' ? firstName : 'You'}
+              />
+            ))}
+          </ol>
+        </Section>
+      )}
 
       <Section title={`What ${firstName} needed`}>
         <ul className="feedback__needs">
@@ -182,6 +198,27 @@ function Need({ need }: { need: NeedFeedback }) {
         </p>
       )}
       <p className="feedback__comment">{need.comment}</p>
+    </li>
+  );
+}
+
+/** One turn of the conversation, with the words the coach is pointing at highlighted. */
+function Moment({ moment, author }: { moment: KeyMoment; author: string }) {
+  const at = moment.message.indexOf(moment.quote);
+  const before = at >= 0 ? moment.message.slice(0, at) : moment.message;
+  const after = at >= 0 ? moment.message.slice(at + moment.quote.length) : '';
+
+  return (
+    <li className="feedback__moment">
+      <Badge {...MOMENT[moment.type]} />
+      <blockquote className={`feedback__turn feedback__turn--${moment.speaker}`}>
+        <p>
+          <strong>{author}:</strong> {before}
+          {at >= 0 && <mark>{moment.quote}</mark>}
+          {after}
+        </p>
+      </blockquote>
+      <p>{moment.note}</p>
     </li>
   );
 }

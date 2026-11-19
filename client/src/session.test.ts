@@ -29,6 +29,7 @@ const summary = {
 };
 
 const feedback: FeedbackResponse = {
+  moments: [],
   needs: [],
   productFit: { recommended: [], missedSuitable: [] },
   wentWell: ['Good questions.'],
