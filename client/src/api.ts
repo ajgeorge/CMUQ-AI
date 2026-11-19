@@ -3,6 +3,8 @@ import {
   type ChatRequest,
   type ChatResponse,
   type ClientsResponse,
+  type FeedbackRequest,
+  type FeedbackResponse,
   type HealthResponse,
   type ProductsResponse,
 } from '@bank-sim/shared';
@@ -62,6 +64,8 @@ export const api = {
   products: (signal?: AbortSignal) => request<ProductsResponse>('/products', { signal }),
   chat: (body: ChatRequest, signal?: AbortSignal) =>
     request<ChatResponse>('/chat', { method: 'POST', body: JSON.stringify(body), signal }),
+  feedback: (body: FeedbackRequest, signal?: AbortSignal) =>
+    request<FeedbackResponse>('/feedback', { method: 'POST', body: JSON.stringify(body), signal }),
 };
 
 /** A message safe to show the student for any error thrown by the calls above. */

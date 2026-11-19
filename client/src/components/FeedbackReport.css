@@ -1,0 +1,133 @@
+.feedback {
+  max-width: 48rem;
+}
+
+.feedback__section {
+  margin-bottom: var(--space-5);
+}
+
+.feedback__section h2 {
+  margin-bottom: var(--space-2);
+}
+
+.feedback__section h3 {
+  margin: var(--space-4) 0 var(--space-2);
+  font-size: 1.0625rem;
+}
+
+.feedback__section ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* The three main parts of the feedback, marked with a coloured edge (the headings carry
+   the meaning, so the colour is only a visual aid). */
+.feedback__part {
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-primary);
+  border-radius: var(--radius);
+}
+
+.feedback__section.feedback__part h2 {
+  margin-top: 0;
+}
+
+.feedback__part--good {
+  border-left-color: var(--color-success);
+}
+
+.feedback__part--bad {
+  border-left-color: var(--color-danger);
+}
+
+.feedback__example {
+  display: block;
+  margin-top: var(--space-1);
+  color: var(--color-text-muted);
+}
+
+.feedback__example q {
+  color: var(--color-text);
+  font-style: italic;
+}
+
+/* Needs and products: one card each. */
+.feedback__section .feedback__needs,
+.feedback__section .feedback__fit {
+  padding: 0;
+  list-style: none;
+  gap: var(--space-3);
+}
+
+.feedback__need,
+.feedback__fit > li {
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.feedback__need p,
+.feedback__fit p {
+  margin: var(--space-2) 0 0;
+}
+
+.feedback__need-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.feedback__section .feedback__need-header h3 {
+  margin: 0;
+  margin-right: auto;
+  font-size: 1.0625rem;
+}
+
+.feedback__evidence {
+  color: var(--color-text-muted);
+}
+
+.feedback__evidence q {
+  color: var(--color-text);
+  font-style: italic;
+}
+
+.feedback__fit-name {
+  font-weight: 700;
+}
+
+.feedback__badge--good {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.feedback__badge--mixed {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+}
+
+.feedback__badge--bad {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+.feedback__summary {
+  margin: var(--space-3) 0 0;
+}
+
+.feedback__summary dt {
+  font-weight: 700;
+  margin-top: var(--space-2);
+}
+
+.feedback__summary dd {
+  margin: 0;
+  white-space: pre-wrap;
+}

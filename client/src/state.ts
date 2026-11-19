@@ -1,6 +1,7 @@
 import {
   CHAT_LIMITS,
   type ChatMessage,
+  type FeedbackResponse,
   type InterviewSummary,
   type PublicClient,
 } from '@bank-sim/shared';
@@ -34,7 +35,11 @@ export type AppState =
   | { step: 'select' }
   | ({ step: 'interview' } & Interview)
   | ({ step: 'summary' } & Interview)
-  | ({ step: 'submitted' } & Interview & { summary: InterviewSummary });
+  | ({ step: 'feedback' } & Interview & {
+        summary: InterviewSummary;
+        /** null while the coach is still working (or its request failed). */
+        feedback: FeedbackResponse | null;
+      });
 
 export type Step = AppState['step'];
 
@@ -45,6 +50,8 @@ export type Action =
   | { type: 'backToInterview' }
   | { type: 'updateDraft'; changes: Partial<SummaryDraft> }
   | { type: 'submit'; summary: InterviewSummary }
+  | { type: 'feedbackReceived'; feedback: FeedbackResponse }
+  | { type: 'backToSummary' }
   | { type: 'restart' };
 
 export const initialState: AppState = { step: 'select' };
@@ -80,7 +87,21 @@ export function reducer(state: AppState, action: Action): AppState {
 
     case 'submit':
       if (state.step !== 'summary') return state;
-      return { ...state, step: 'submitted', summary: action.summary };
+      return { ...state, step: 'feedback', summary: action.summary, feedback: null };
+
+    case 'feedbackReceived':
+      if (state.step !== 'feedback' || state.feedback) return state;
+      return { ...state, feedback: action.feedback };
+
+    // Only while waiting for feedback (e.g. after it failed): the draft is still there.
+    case 'backToSummary':
+      if (state.step !== 'feedback' || state.feedback) return state;
+      return {
+        step: 'summary',
+        client: state.client,
+        messages: state.messages,
+        draft: state.draft,
+      };
 
     case 'restart':
       return initialState;

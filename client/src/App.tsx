@@ -1,7 +1,8 @@
 import { useEffect, useReducer, useRef, useState } from 'react';
-import type { Bank, Product, PublicClient } from '@bank-sim/shared';
+import type { Bank, ChatMessage, InterviewSummary, Product, PublicClient } from '@bank-sim/shared';
 import { api, errorMessage } from './api';
 import { ClientSelect } from './components/ClientSelect';
+import { FeedbackReport } from './components/FeedbackReport';
 import { InterviewChat } from './components/InterviewChat';
 import { ProductPanel } from './components/ProductPanel';
 import { StepIndicator } from './components/StepIndicator';
@@ -29,9 +30,39 @@ export function App() {
   // heading takes focus. On the first page load focus is left alone.
   const [navigated, setNavigated] = useState(false);
 
+  // The coach's request is sent from here when the summary is submitted, rather than from
+  // an effect on the feedback screen, so it goes out exactly once per submit (effects run
+  // twice in development, which would use up the AI's per-minute allowance).
+  const feedbackRequest = useRef<AbortController | null>(null);
+  const [feedbackError, setFeedbackError] = useState<string | null>(null);
+
+  function requestFeedback(clientId: string, messages: ChatMessage[], summary: InterviewSummary) {
+    feedbackRequest.current?.abort();
+    const controller = new AbortController();
+    feedbackRequest.current = controller;
+    setFeedbackError(null);
+    api
+      .feedback({ clientId, messages, summary }, controller.signal)
+      .then((feedback) => dispatch({ type: 'feedbackReceived', feedback }))
+      .catch((err: unknown) => {
+        if (!controller.signal.aborted) setFeedbackError(errorMessage(err));
+      });
+  }
+
   function act(action: Action) {
     if (action.type !== 'updateDraft') setNavigated(true);
+    if (action.type === 'start' || action.type === 'restart' || action.type === 'backToSummary') {
+      feedbackRequest.current?.abort();
+      setFeedbackError(null);
+    }
     dispatch(action);
+    if (action.type === 'submit' && state.step === 'summary') {
+      requestFeedback(state.client.id, state.messages, action.summary);
+    }
+  }
+
+  function retryFeedback() {
+    if (state.step === 'feedback') requestFeedback(state.client.id, state.messages, state.summary);
   }
 
   // Bumped by "Try again" to load the data once more.
@@ -82,7 +113,14 @@ export function App() {
           </div>
         )}
         {loading.status === 'ready' && (
-          <Screen state={state} data={loading.data} dispatch={act} focusHeading={navigated} />
+          <Screen
+            state={state}
+            data={loading.data}
+            dispatch={act}
+            focusHeading={navigated}
+            feedbackError={feedbackError}
+            onRetryFeedback={retryFeedback}
+          />
         )}
       </main>
     </>
@@ -94,10 +132,13 @@ interface ScreenProps {
   data: Catalogue;
   dispatch: (action: Action) => void;
   focusHeading: boolean;
+  feedbackError: string | null;
+  onRetryFeedback: () => void;
 }
 
 /** The current step's content, with a heading that receives focus when the step changes. */
-function Screen({ state, data, dispatch, focusHeading }: ScreenProps) {
+function Screen(props: ScreenProps) {
+  const { state, data, dispatch, focusHeading, feedbackError, onRetryFeedback } = props;
   const title = screenTitle(state);
   // Keyed by step so each screen gets a fresh heading that takes focus when it appears.
   const heading = <Heading key={state.step} title={title} focus={focusHeading} />;
@@ -160,21 +201,41 @@ function Screen({ state, data, dispatch, focusHeading }: ScreenProps) {
         </>
       );
 
-    case 'submitted':
-      // Replaced by the coach's feedback in the next phase.
+    case 'feedback':
       return (
         <>
           {heading}
-          <p className="lead">
-            Coach feedback will appear here once the AI coach is added. Your summary recommended:{' '}
-            {state.summary.recommendedProductIds
-              .map((id) => data.products.find((p) => p.id === id)?.name ?? id)
-              .join(', ')}
-            .
-          </p>
-          <button type="button" className="button" onClick={() => dispatch({ type: 'restart' })}>
-            Interview another client
-          </button>
+          {state.feedback ? (
+            <FeedbackReport
+              client={state.client}
+              products={data.products}
+              messages={state.messages}
+              summary={state.summary}
+              feedback={state.feedback}
+              onRestart={() => dispatch({ type: 'restart' })}
+              onRetryClient={() => dispatch({ type: 'start', client: state.client })}
+            />
+          ) : feedbackError ? (
+            <div role="alert" className="alert alert--error">
+              <p>The coach could not review your interview. {feedbackError}</p>
+              <div className="button-row">
+                <button type="button" className="button" onClick={onRetryFeedback}>
+                  Try again
+                </button>
+                <button
+                  type="button"
+                  className="button button--secondary"
+                  onClick={() => dispatch({ type: 'backToSummary' })}
+                >
+                  Back to your summary
+                </button>
+              </div>
+            </div>
+          ) : (
+            <p role="status" className="lead">
+              The coach is reviewing your interview. This usually takes a few seconds…
+            </p>
+          )}
         </>
       );
   }
@@ -212,8 +273,8 @@ function screenTitle(state: AppState): string {
       return `Interview with ${state.client.name}`;
     case 'summary':
       return 'Your summary and recommendations';
-    case 'submitted':
-      return 'Summary submitted';
+    case 'feedback':
+      return `Feedback on your interview with ${state.client.name}`;
   }
 }
 

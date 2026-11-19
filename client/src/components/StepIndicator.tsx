@@ -5,7 +5,7 @@ const STEPS: { label: string; steps: Step[] }[] = [
   { label: 'Choose a client', steps: ['select'] },
   { label: 'Interview', steps: ['interview'] },
   { label: 'Summary', steps: ['summary'] },
-  { label: 'Feedback', steps: ['submitted'] },
+  { label: 'Feedback', steps: ['feedback'] },
 ];
 
 export function StepIndicator({ current }: { current: Step }) {

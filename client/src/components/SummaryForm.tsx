@@ -8,6 +8,7 @@ import {
   type PublicClient,
 } from '@bank-sim/shared';
 import type { SummaryDraft } from '../state';
+import { Transcript } from './Transcript';
 import './SummaryForm.css';
 
 type Field = keyof SummaryDraft;
@@ -72,19 +73,7 @@ export function SummaryForm(props: Props) {
 
   return (
     <form className="summary" onSubmit={handleSubmit} noValidate>
-      <details className="summary__transcript">
-        <summary>Show the interview transcript</summary>
-        <ol className="summary__transcript-list">
-          <li>
-            <strong>{firstName}:</strong> {client.openingLine}
-          </li>
-          {messages.map((m, i) => (
-            <li key={i}>
-              <strong>{m.role === 'client' ? firstName : 'You'}:</strong> {m.content}
-            </li>
-          ))}
-        </ol>
-      </details>
+      <Transcript client={client} messages={messages} label="Show the interview transcript" />
 
       <TextField
         ref={needsRef}

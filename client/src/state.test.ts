@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { CHAT_LIMITS, type ChatMessage, type PublicClient } from '@bank-sim/shared';
+import {
+  CHAT_LIMITS,
+  type ChatMessage,
+  type FeedbackResponse,
+  type PublicClient,
+} from '@bank-sim/shared';
 import {
   EMPTY_DRAFT,
   canEndInterview,
@@ -26,6 +31,15 @@ const summary = {
   needsIdentified: 'Cash flow gap',
   recommendedProductIds: ['islamic-receivables-finance'],
   justification: 'Sharia-compliant and covers the 60 to 90 day gap.',
+};
+
+const feedback: FeedbackResponse = {
+  needs: [],
+  productFit: { recommended: [], missedSuitable: [] },
+  wentWell: ['Good questions.'],
+  missed: [],
+  improve: [{ advice: 'Ask about preferences.', exampleQuestion: null }],
+  productAccuracy: { status: 'no-claims', comment: 'None described.' },
 };
 
 function run(...actions: Action[]): AppState {
@@ -85,14 +99,47 @@ describe('reducer', () => {
     expect(state.step === 'summary' && state.draft.needsIdentified).toBe('Cash flow');
   });
 
-  it('submits the summary', () => {
+  it('submits the summary and waits for feedback', () => {
     const state = run(
       { type: 'start', client: ahmed },
       ...ask(3),
       { type: 'endInterview' },
       { type: 'submit', summary },
     );
-    expect(state).toMatchObject({ step: 'submitted', summary });
+    expect(state).toMatchObject({ step: 'feedback', summary, feedback: null });
+  });
+
+  it('stores the feedback once, and only on the feedback step', () => {
+    const submitted = run(
+      { type: 'start', client: ahmed },
+      ...ask(3),
+      { type: 'endInterview' },
+      { type: 'submit', summary },
+    );
+    const received = reducer(submitted, { type: 'feedbackReceived', feedback });
+    expect(received).toMatchObject({ step: 'feedback', feedback });
+
+    // A late reply for an earlier attempt must not replace it, or land on another step.
+    expect(reducer(received, { type: 'feedbackReceived', feedback: { ...feedback } })).toBe(
+      received,
+    );
+    expect(run({ type: 'feedbackReceived', feedback })).toEqual(initialState);
+  });
+
+  it('goes back to the summary, keeping the draft, only while feedback is pending', () => {
+    const submitted = run(
+      { type: 'start', client: ahmed },
+      ...ask(3),
+      { type: 'endInterview' },
+      { type: 'updateDraft', changes: { needsIdentified: 'Cash flow' } },
+      { type: 'submit', summary },
+    );
+    const back = reducer(submitted, { type: 'backToSummary' });
+    expect(back).toMatchObject({ step: 'summary', draft: { needsIdentified: 'Cash flow' } });
+    expect(back).not.toHaveProperty('summary');
+
+    const received = reducer(submitted, { type: 'feedbackReceived', feedback });
+    expect(reducer(received, { type: 'backToSummary' })).toBe(received);
   });
 
   it('ignores actions that do not fit the current step', () => {
