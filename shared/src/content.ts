@@ -22,8 +22,10 @@ export const IdSchema = z
 export const ProductSchema = z.strictObject({
   id: IdSchema,
   name: text,
-  category: z.enum(['business', 'personal']),
-  type: z.enum(['account', 'financing', 'savings', 'investment']),
+  /** Any short label, e.g. "business" or "personal". The app groups products by it. */
+  category: text,
+  /** Any short label, e.g. "account", "financing", "savings" or "investment". */
+  type: text,
   shariaCompliant: z.boolean(),
   summary: text,
   features: textList,

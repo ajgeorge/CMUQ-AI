@@ -65,17 +65,17 @@ appear in one list. Products not listed are treated as not relevant to this clie
 
 `bank` holds the bank's name and currency. Each product in `products` has:
 
-| Field             | What it is                                              |
-| ----------------- | ------------------------------------------------------- |
-| `id`              | Short name, lowercase with dashes; used in `productFit` |
-| `name`            | Display name                                            |
-| `category`        | `business` or `personal`                                |
-| `type`            | `account`, `financing`, `savings` or `investment`       |
-| `shariaCompliant` | `true` or `false`                                       |
-| `summary`         | One sentence                                            |
-| `features`        | List of main features                                   |
-| `limitations`     | List of limitations                                     |
-| `eligibility`     | List of who can apply                                   |
-| `fees`            | Short description of the fees                           |
+| Field             | What it is                                                                                                     |
+| ----------------- | -------------------------------------------------------------------------------------------------------------- |
+| `id`              | Short name, lowercase with dashes; used in `productFit`                                                        |
+| `name`            | Display name                                                                                                   |
+| `category`        | Any short label, e.g. `business` or `personal`. The app groups products by it, so a new one gets its own group |
+| `type`            | Any short label, e.g. `account`, `financing`, `savings`, `investment` or `credit card`                         |
+| `shariaCompliant` | `true` or `false`                                                                                              |
+| `summary`         | One sentence                                                                                                   |
+| `features`        | List of main features                                                                                          |
+| `limitations`     | List of limitations                                                                                            |
+| `eligibility`     | List of who can apply                                                                                          |
+| `fees`            | Short description of the fees                                                                                  |
 
 All banks, people and products here are fictional.

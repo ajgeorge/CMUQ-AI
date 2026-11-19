@@ -7,6 +7,7 @@ import {
   type Product,
   type PublicClient,
 } from '@bank-sim/shared';
+import { groupByCategory } from '../product-groups';
 import type { SummaryDraft } from '../state';
 import { Transcript } from './Transcript';
 import './SummaryForm.css';
@@ -168,10 +169,7 @@ interface ProductChoicesProps {
 
 function ProductChoices({ ref, products, selected, error, onToggle }: ProductChoicesProps) {
   const id = useId();
-  const groups = [
-    { label: 'Business products', items: products.filter((p) => p.category === 'business') },
-    { label: 'Personal products', items: products.filter((p) => p.category === 'personal') },
-  ];
+  const groups = groupByCategory(products);
 
   return (
     <fieldset
@@ -183,9 +181,9 @@ function ProductChoices({ ref, products, selected, error, onToggle }: ProductCho
       <p className="field__hint">Choose one or more. Details are in the product list.</p>
       <div className="summary__groups">
         {groups.map((group) => (
-          <fieldset key={group.label} className="summary__group">
+          <fieldset key={group.category} className="summary__group">
             <legend className="summary__group-label">{group.label}</legend>
-            {group.items.map((product) => (
+            {group.products.map((product) => (
               <label key={product.id} className="summary__choice">
                 <input
                   type="checkbox"

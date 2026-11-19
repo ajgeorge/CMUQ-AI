@@ -1,11 +1,7 @@
 import { useId, useState } from 'react';
 import type { Product } from '@bank-sim/shared';
+import { capitalise, groupByCategory } from '../product-groups';
 import './ProductPanel.css';
-
-const CATEGORIES: { id: Product['category']; label: string }[] = [
-  { id: 'business', label: 'Business' },
-  { id: 'personal', label: 'Personal' },
-];
 
 /**
  * The bank's product information, as a relationship manager would have it to hand.
@@ -35,17 +31,15 @@ export function ProductPanel({ products }: { products: Product[] }) {
 
       <div id={bodyId} className="products__body">
         <p className="products__intro">Select a product to see its details.</p>
-        {CATEGORIES.map((category) => (
-          <div key={category.id}>
-            <h3 className="products__category">{category.label}</h3>
+        {groupByCategory(products).map((group) => (
+          <div key={group.category}>
+            <h3 className="products__category">{group.label}</h3>
             <ul className="products__list">
-              {products
-                .filter((p) => p.category === category.id)
-                .map((product) => (
-                  <li key={product.id}>
-                    <ProductDetails product={product} />
-                  </li>
-                ))}
+              {group.products.map((product) => (
+                <li key={product.id}>
+                  <ProductDetails product={product} />
+                </li>
+              ))}
             </ul>
           </div>
         ))}
@@ -90,8 +84,4 @@ function DetailList({ title, items }: { title: string; items: string[] }) {
       </ul>
     </>
   );
-}
-
-function capitalise(text: string): string {
-  return text.charAt(0).toUpperCase() + text.slice(1);
 }
