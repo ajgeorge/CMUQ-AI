@@ -70,12 +70,13 @@ Tested on **Groq** (free tier):
 | Backup for both | `openai/gpt-oss-20b`  | Has its own usage allowance on Groq. It passed the same coach checks as the main coach model; as the client it is a little less natural than qwen, but better than an error mid-interview. |
 
 **Free-tier limits.** Groq's free tier gives each model 8,000 tokens per minute, and
-gpt-oss-120b 200,000 tokens per day. One coach review uses about 4,500 to 5,500 tokens, so
-the coach model alone allows two reviews a minute and roughly 40 a day. With the backup model
-set, the next reviews go to the backup when either limit is reached, so students don't see an
-error. A typical interview is well within the per-request limit, but one that uses all 30
-questions with very long messages and summary can need about 9,500 tokens for a single review,
-more than the free tier allows in one request. The app then explains that the interview is too
+gpt-oss-120b 200,000 tokens per day. One coach review uses about 4,500 to 7,000 tokens,
+depending on the length of the interview, so the coach model alone allows about one review a
+minute and 30 to 40 a day. With the backup model set, the next reviews go to the backup when
+either limit is reached, so students don't see an error. A typical interview is well within
+the per-request limit, but one that uses all 30 questions with very long messages and summary
+can need around 10,000 tokens for a single review, more than the free tier allows in one
+request. The app then explains that the interview is too
 long for the current usage limits instead of failing silently. A paid tier raises these
 limits.
 
@@ -122,16 +123,17 @@ for the open tab only, so a page refresh doesn't lose it.
   The coach is told this result and must not contradict it, so a wrong recommendation is always
   flagged.
 - **Structured output.** The coach replies in JSON, which is checked against a schema (with
-  zod) and against the client's list of needs. If the reply is unusable, the coach is asked once
-  more with the problems listed; if that also fails, the student gets a clear error with a
-  "Try again" button.
+  zod) and against the client's list of needs. If the reply is unusable, including when the
+  provider itself rejects it as invalid JSON, the coach is asked once more with the problems
+  listed; if that also fails, the student gets a clear error with a "Try again" button.
 - **Evidence is verified.** For each need it found, the coach quotes the student's question
   that uncovered it. The quote is matched against the real transcript and replaced with the
   student's exact question; a quote that doesn't match anything is dropped.
 - **Product accuracy.** The coach gets the details of the relevant products and checks
   everything the student told the client about them. The app also detects which products were
-  named in the conversation, so the coach can't call the student's product information
-  "accurate" when they never described any product.
+  named in the conversation, and holds the coach to it both ways: it can't call the student's
+  product information "accurate" when they never described a product, and it can't say "no
+  product details given" when they did (that reply is sent back for another attempt).
 - **Key moments, pinned to the conversation.** The coach reads a numbered transcript and picks
   out the turns that taught the most: a strong question, a hint from the client the student
   didn't follow up, a wrong claim about a product, or a product pitched too early. The
