@@ -3,7 +3,12 @@ import type { ApiErrorCode } from '@bank-sim/shared';
 
 export type AiErrorCode = Extract<
   ApiErrorCode,
-  'RATE_LIMITED' | 'AI_TIMEOUT' | 'AI_UNAVAILABLE' | 'AI_CONFIG_ERROR' | 'AI_BAD_RESPONSE'
+  | 'RATE_LIMITED'
+  | 'AI_TOO_LARGE'
+  | 'AI_TIMEOUT'
+  | 'AI_UNAVAILABLE'
+  | 'AI_CONFIG_ERROR'
+  | 'AI_BAD_RESPONSE'
 >;
 
 /** What the student sees, and the HTTP status the API responds with, for each failure. */
@@ -11,6 +16,12 @@ const FAILURES: Record<AiErrorCode, { status: number; message: string }> = {
   RATE_LIMITED: {
     status: 429,
     message: 'The AI is busy right now. Please wait a moment and try again.',
+  },
+  AI_TOO_LARGE: {
+    status: 413,
+    message:
+      "This interview is too long for the AI service's current usage limits, so it can't be " +
+      'processed. Please let the administrator know.',
   },
   AI_TIMEOUT: {
     status: 504,
@@ -75,8 +86,10 @@ export function toAiError(err: unknown): AiError {
       return new AiError('AI_CONFIG_ERROR', `The API key was rejected: ${detail}`);
     case 404:
       return new AiError('AI_CONFIG_ERROR', `Model or URL not found: ${detail}`);
-    // Groq uses 413 when one request is bigger than the per-minute token allowance.
+    // Groq uses 413 when one request is bigger than the whole per-minute token allowance,
+    // so waiting and retrying can never help (unlike 429).
     case 413:
+      return new AiError('AI_TOO_LARGE', detail);
     case 429:
       return new AiError('RATE_LIMITED', detail);
     case 400:

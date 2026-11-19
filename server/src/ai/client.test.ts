@@ -195,7 +195,7 @@ describe('error classification', () => {
     [
       'a request over the per-minute token limit',
       failure(413, 'Request too large'),
-      'RATE_LIMITED',
+      'AI_TOO_LARGE',
     ],
     ['a provider outage', failure(500), 'AI_UNAVAILABLE'],
     ['a network failure', 'network-error' as const, 'AI_UNAVAILABLE'],

@@ -19,6 +19,7 @@ export const ApiErrorCodeSchema = z.enum([
   'INTERNAL_ERROR',
   // AI provider failures (see server/src/ai/errors.ts)
   'RATE_LIMITED',
+  'AI_TOO_LARGE',
   'AI_TIMEOUT',
   'AI_UNAVAILABLE',
   'AI_CONFIG_ERROR',
@@ -74,6 +75,63 @@ export const ChatMessageSchema = z.strictObject({
 export type ChatMessage = z.infer<typeof ChatMessageSchema>;
 
 /**
+ * Checks shared by the chat and feedback requests: the conversation starts with the
+ * student, alternates, ends with `lastRole`, and stays within the interview limits.
+ */
+function checkConversation(
+  messages: ChatMessage[],
+  ctx: z.RefinementCtx,
+  { lastRole, maxChars }: { lastRole: ChatMessage['role']; maxChars: number },
+) {
+  let total = 0;
+  messages.forEach((message, i) => {
+    const expected = i % 2 === 0 ? 'student' : 'client';
+    if (message.role !== expected) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['messages', i, 'role'],
+        message: `expected a ${expected} message here (the conversation must alternate, starting with the student)`,
+      });
+    }
+    const max =
+      message.role === 'student'
+        ? CHAT_LIMITS.maxStudentMessageChars
+        : CHAT_LIMITS.maxClientMessageChars;
+    if (message.content.length > max) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['messages', i, 'content'],
+        message: `must be ${max} characters or fewer`,
+      });
+    }
+    total += message.content.length;
+  });
+
+  if (messages.at(-1)?.role !== lastRole) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['messages'],
+      message: `the last message must be from the ${lastRole}`,
+    });
+  }
+  const questions = messages.filter((m) => m.role === 'student').length;
+  if (questions > CHAT_LIMITS.maxStudentTurns) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['messages'],
+      message: `the interview has reached its limit of ${CHAT_LIMITS.maxStudentTurns} questions`,
+    });
+  }
+  if (total > maxChars) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['messages'],
+      message: 'the interview has reached its maximum length',
+    });
+  }
+}
+
+/**
  * The conversation so far, NOT including the client's opening line (the server adds
  * that itself). It starts with the student, alternates, and ends with the student.
  */
@@ -82,53 +140,12 @@ export const ChatRequestSchema = z
     clientId: IdSchema,
     messages: z.array(ChatMessageSchema).min(1, 'the conversation is empty'),
   })
-  .superRefine(({ messages }, ctx) => {
-    let total = 0;
-    messages.forEach((message, i) => {
-      const expected = i % 2 === 0 ? 'student' : 'client';
-      if (message.role !== expected) {
-        ctx.addIssue({
-          code: 'custom',
-          path: ['messages', i, 'role'],
-          message: `expected a ${expected} message here (the conversation must alternate, starting with the student)`,
-        });
-      }
-      const max =
-        message.role === 'student'
-          ? CHAT_LIMITS.maxStudentMessageChars
-          : CHAT_LIMITS.maxClientMessageChars;
-      if (message.content.length > max) {
-        ctx.addIssue({
-          code: 'custom',
-          path: ['messages', i, 'content'],
-          message: `must be ${max} characters or fewer`,
-        });
-      }
-      total += message.content.length;
-    });
-
-    if (messages.at(-1)?.role !== 'student') {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['messages'],
-        message: 'the last message must be from the student',
-      });
-    }
-    if (Math.ceil(messages.length / 2) > CHAT_LIMITS.maxStudentTurns) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['messages'],
-        message: `the interview has reached its limit of ${CHAT_LIMITS.maxStudentTurns} questions`,
-      });
-    }
-    if (total > CHAT_LIMITS.maxConversationChars) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['messages'],
-        message: 'the interview has reached its maximum length',
-      });
-    }
-  });
+  .superRefine(({ messages }, ctx) =>
+    checkConversation(messages, ctx, {
+      lastRole: 'student',
+      maxChars: CHAT_LIMITS.maxConversationChars,
+    }),
+  );
 export type ChatRequest = z.infer<typeof ChatRequestSchema>;
 
 /** Response of POST /api/chat. */
@@ -173,3 +190,97 @@ export const InterviewSummarySchema = z.strictObject({
     ),
 });
 export type InterviewSummary = z.infer<typeof InterviewSummarySchema>;
+
+// ---------------------------------------------------------------------------
+// Coach feedback — POST /api/feedback
+// ---------------------------------------------------------------------------
+
+/**
+ * The finished interview and the student's summary. The conversation ends with the
+ * client's last reply, so it can be up to one reply longer than a chat request.
+ */
+export const FeedbackRequestSchema = z
+  .strictObject({
+    clientId: IdSchema,
+    messages: z.array(ChatMessageSchema),
+    summary: InterviewSummarySchema,
+  })
+  .superRefine(({ messages }, ctx) => {
+    const questions = messages.filter((m) => m.role === 'student').length;
+    if (questions < CHAT_LIMITS.minStudentTurns) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['messages'],
+        message: `ask at least ${CHAT_LIMITS.minStudentTurns} questions before asking for feedback`,
+      });
+      return;
+    }
+    checkConversation(messages, ctx, {
+      lastRole: 'client',
+      maxChars: CHAT_LIMITS.maxConversationChars + CHAT_LIMITS.maxClientMessageChars,
+    });
+  });
+export type FeedbackRequest = z.infer<typeof FeedbackRequestSchema>;
+
+const coachText = z.string().trim().min(1);
+
+export const NeedStatusSchema = z.enum(['found', 'partly', 'missed']);
+export type NeedStatus = z.infer<typeof NeedStatusSchema>;
+
+/**
+ * What the AI coach must reply with (JSON). Not strict: harmless extra keys from the
+ * model are dropped instead of failing the whole reply.
+ */
+export const CoachOutputSchema = z.object({
+  needs: z.array(
+    z.object({
+      id: z.string(),
+      status: NeedStatusSchema,
+      /** The student's question that uncovered the need, copied from the transcript. */
+      evidence: z.string().trim().nullable(),
+      comment: coachText,
+    }),
+  ),
+  wentWell: z.array(coachText).min(1),
+  missed: z.array(coachText),
+  improve: z
+    .array(z.object({ advice: coachText, exampleQuestion: z.string().trim().nullable() }))
+    .min(1),
+  productAccuracy: z.object({
+    status: z.enum(['accurate', 'issues', 'no-claims']),
+    comment: coachText,
+  }),
+});
+export type CoachOutput = z.infer<typeof CoachOutputSchema>;
+
+/** How a product fits the client, from the client's answer key (not decided by the AI). */
+export type FitRating = 'suitable' | 'acceptable' | 'unsuitable' | 'not-relevant';
+
+export interface ProductFitResult {
+  /** Each product the student recommended, in the order they chose them. */
+  recommended: { productId: string; rating: FitRating; reason: string | null }[];
+  /** Suitable products the student did not recommend. */
+  missedSuitable: { productId: string; reason: string }[];
+}
+
+/** A hidden need, revealed after the interview, with the coach's verdict. */
+export interface NeedFeedback {
+  id: string;
+  title: string;
+  importance: 'critical' | 'medium' | 'low';
+  description: string;
+  status: NeedStatus;
+  /** Only set when it matches something the student actually asked. */
+  evidence: string | null;
+  comment: string;
+}
+
+/** Response of POST /api/feedback. */
+export interface FeedbackResponse {
+  needs: NeedFeedback[];
+  productFit: ProductFitResult;
+  wentWell: string[];
+  missed: string[];
+  improve: CoachOutput['improve'];
+  productAccuracy: CoachOutput['productAccuracy'];
+}

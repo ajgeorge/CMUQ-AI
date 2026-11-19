@@ -9,6 +9,7 @@ import { sendError } from './http.js';
 import { CLIENT_DIST, REPO_ROOT } from './paths.js';
 import { chatRouter } from './routes/chat.js';
 import { contentRouter } from './routes/content.js';
+import { feedbackRouter } from './routes/feedback.js';
 
 function readVersion(): string {
   const pkgPath = path.join(REPO_ROOT, 'package.json');
@@ -37,6 +38,7 @@ export function createApp({ content, ai }: AppDeps): express.Express {
 
   api.use(contentRouter(content));
   api.use(chatRouter(content, ai));
+  api.use(feedbackRouter(content, ai));
 
   // Unknown API route → JSON 404 (never fall through to the SPA).
   api.use((req, res) => {
