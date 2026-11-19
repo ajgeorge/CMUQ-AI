@@ -2,40 +2,23 @@ import { useId, type ReactNode } from 'react';
 import type {
   ChatMessage,
   FeedbackResponse,
-  FitRating,
   InterviewSummary,
   NeedFeedback,
-  NeedStatus,
   Product,
   PublicClient,
 } from '@bank-sim/shared';
+import { downloadMarkdown } from '../export';
+import {
+  ACCURACY,
+  FIT,
+  NEED_STATUS,
+  firstNameOf,
+  needsFoundLine,
+  notRelevantReason,
+  type Label,
+} from '../feedback-labels';
 import { Transcript } from './Transcript';
 import './FeedbackReport.css';
-
-type Tone = 'good' | 'mixed' | 'bad' | 'neutral';
-
-// Every badge has a symbol and words, so nothing depends on colour alone.
-const NEED_STATUS: Record<NeedStatus, { label: string; symbol: string; tone: Tone }> = {
-  found: { label: 'Found', symbol: '✓', tone: 'good' },
-  partly: { label: 'Partly found', symbol: '◐', tone: 'mixed' },
-  missed: { label: 'Missed', symbol: '✗', tone: 'bad' },
-};
-
-const FIT: Record<FitRating, { label: string; symbol: string; tone: Tone }> = {
-  suitable: { label: 'Suitable', symbol: '✓', tone: 'good' },
-  acceptable: { label: 'Acceptable', symbol: '◐', tone: 'mixed' },
-  unsuitable: { label: 'Unsuitable', symbol: '✗', tone: 'bad' },
-  'not-relevant': { label: 'Not a match', symbol: '–', tone: 'neutral' },
-};
-
-const ACCURACY: Record<
-  FeedbackResponse['productAccuracy']['status'],
-  { label: string; symbol: string; tone: Tone }
-> = {
-  accurate: { label: 'Accurate', symbol: '✓', tone: 'good' },
-  issues: { label: 'Some information was wrong', symbol: '✗', tone: 'bad' },
-  'no-claims': { label: 'No product details given', symbol: '–', tone: 'neutral' },
-};
 
 interface Props {
   client: PublicClient;
@@ -49,16 +32,14 @@ interface Props {
 
 export function FeedbackReport(props: Props) {
   const { client, products, messages, summary, feedback, onRestart, onRetryClient } = props;
-  const firstName = client.name.split(' ')[0] ?? client.name;
+  const firstName = firstNameOf(client.name);
   const productName = (id: string) => products.find((p) => p.id === id)?.name ?? id;
-
-  const found = feedback.needs.filter((n) => n.status === 'found').length;
 
   return (
     <div className="feedback">
       <p className="lead">
-        You fully uncovered {found} of {firstName}&apos;s {feedback.needs.length} needs. Here is
-        what the coach noticed, followed by everything {firstName} was waiting to be asked about.
+        {needsFoundLine(feedback, firstName)} Here is what the coach noticed, followed by everything{' '}
+        {firstName} was waiting to be asked about.
       </p>
 
       <Section title="What went well" className="feedback__part feedback__part--good">
@@ -110,10 +91,7 @@ export function FeedbackReport(props: Props) {
             <li key={productId}>
               <span className="feedback__fit-name">{productName(productId)}</span>{' '}
               <Badge {...FIT[rating]} />
-              <p>
-                {reason ??
-                  `This isn't one of the products the bank considers relevant to ${firstName}'s needs.`}
-              </p>
+              <p>{reason ?? notRelevantReason(firstName)}</p>
             </li>
           ))}
         </ul>
@@ -157,6 +135,15 @@ export function FeedbackReport(props: Props) {
         <button type="button" className="button button--secondary" onClick={onRetryClient}>
           Try {firstName} again
         </button>
+        <button
+          type="button"
+          className="button button--secondary"
+          onClick={() =>
+            downloadMarkdown({ client, products, messages, summary, feedback, date: new Date() })
+          }
+        >
+          Download as Markdown
+        </button>
       </div>
     </div>
   );
@@ -199,7 +186,7 @@ function Need({ need }: { need: NeedFeedback }) {
   );
 }
 
-function Badge({ label, symbol, tone }: { label: string; symbol: string; tone: Tone }) {
+function Badge({ label, symbol, tone }: Label) {
   return (
     <span className={`badge feedback__badge feedback__badge--${tone}`}>
       <span aria-hidden="true">{symbol}</span> {label}
