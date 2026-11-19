@@ -25,7 +25,7 @@ You need **Node.js 22.12 or newer** and an API key for an OpenAI-compatible prov
 ```bash
 npm install
 cp .env.example .env      # then put your API key in AI_API_KEY
-npm run check:ai          # confirms the key and both models work
+npm run check:ai          # confirms the key and that every model works
 npm run dev               # open http://localhost:5173
 ```
 
@@ -40,39 +40,44 @@ npm start                 # open http://localhost:3001
 
 All AI settings are in `.env` (see [`.env.example`](.env.example)):
 
-| Setting                                             | What it is                                                                                                                     |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `AI_BASE_URL`                                       | The provider's API address. Default: `https://api.groq.com/openai/v1`                                                          |
-| `AI_API_KEY`                                        | Your API key. Only the server uses it; it never reaches the browser.                                                           |
-| `CLIENT_MODEL`                                      | The model that plays the bank client                                                                                           |
-| `COACH_MODEL`                                       | The model that reviews the interview. It must support JSON output.                                                             |
-| `CLIENT_REASONING_EFFORT`, `COACH_REASONING_EFFORT` | Optional, for reasoning models: `low`, `medium` or `high`                                                                      |
-| `AI_TIMEOUT_MS`                                     | How long to wait for one AI response (default 30 seconds). Timeouts, rate limits and temporary errors are retried up to twice. |
-| `PORT`                                              | The server's port (default 3001)                                                                                               |
+| Setting                                                               | What it is                                                                                                                                                                             |
+| --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AI_BASE_URL`                                                         | The provider's API address. Default: `https://api.groq.com/openai/v1`                                                                                                                  |
+| `AI_API_KEY`                                                          | Your API key. Only the server uses it; it never reaches the browser.                                                                                                                   |
+| `CLIENT_MODEL`                                                        | The model that plays the bank client                                                                                                                                                   |
+| `COACH_MODEL`                                                         | The model that reviews the interview. It must support JSON output.                                                                                                                     |
+| `CLIENT_REASONING_EFFORT`, `COACH_REASONING_EFFORT`                   | Optional, for reasoning models: `low`, `medium` or `high`                                                                                                                              |
+| `CLIENT_FALLBACK_MODEL`, `COACH_FALLBACK_MODEL`                       | Optional backup models, used when the main model is rate-limited, over its limits, too slow or down (see "Model routing" below)                                                        |
+| `CLIENT_FALLBACK_REASONING_EFFORT`, `COACH_FALLBACK_REASONING_EFFORT` | The same reasoning setting, for the backup models                                                                                                                                      |
+| `AI_TIMEOUT_MS`                                                       | How long to wait for one AI response (default 30 seconds). Timeouts, rate limits and temporary errors are retried up to twice, or passed straight to the backup model if there is one. |
+| `PORT`                                                                | The server's port (default 3001)                                                                                                                                                       |
 
 To use another provider, change `AI_BASE_URL`, `AI_API_KEY` and the two model names, for
 example `https://api.openai.com/v1` for OpenAI or `http://localhost:11434/v1` for a local
 Ollama (which accepts any key value). Only Groq has been tested, so run `npm run check:ai`
-after switching: it checks the key, that both models exist, that both answer, and that the
-coach model returns JSON. If the settings are missing or invalid, the server says which ones
-when it starts.
+after switching: it checks the key, and that every configured model (backups included) exists,
+answers, and for the coach returns JSON. If the settings are missing or invalid, the server
+says which ones when it starts.
 
 ### Models used for testing
 
 Tested on **Groq** (free tier):
 
-| Role      | Model                 | Why                                                                                                                                                                   |
-| --------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| AI client | `qwen/qwen3.8-27b`    | Fast enough for a natural conversation, keeps to short replies, and kept its private details back better than the gpt-oss models, which also ignored the length rule. |
-| AI coach  | `openai/gpt-oss-120b` | Reliable structured (JSON) output and careful judgement. A review takes about 3 to 4 seconds.                                                                         |
+| Role            | Model                 | Why                                                                                                                                                                                        |
+| --------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| AI client       | `qwen/qwen3.8-27b`    | Fast enough for a natural conversation, keeps to short replies, and kept its private details back better than the gpt-oss models, which also ignored the length rule.                      |
+| AI coach        | `openai/gpt-oss-120b` | Reliable structured (JSON) output and careful judgement. A review takes about 3 to 4 seconds.                                                                                              |
+| Backup for both | `openai/gpt-oss-20b`  | Has its own usage allowance on Groq. It passed the same coach checks as the main coach model; as the client it is a little less natural than qwen, but better than an error mid-interview. |
 
-**Free-tier limit.** Groq's free tier allows 8,000 tokens per minute for each model. One coach
-review uses about 4,000 to 4,600 tokens, so two reviews in the same minute can hit the limit;
-the app then asks the student to wait a moment and try again. A typical interview is well
-within limits, but one that uses all 30 questions with very long messages and summary can need
-about 9,000 tokens for a single review, more than the free tier allows in one request. The app
-then explains that the interview is too long for the current usage limits instead of failing
-silently. A paid tier raises these limits.
+**Free-tier limits.** Groq's free tier gives each model 8,000 tokens per minute, and
+gpt-oss-120b 200,000 tokens per day. One coach review uses about 4,500 to 5,500 tokens, so
+the coach model alone allows two reviews a minute and roughly 40 a day. With the backup model
+set, the next reviews go to the backup when either limit is reached, so students don't see an
+error. A typical interview is well within the per-request limit, but one that uses all 30
+questions with very long messages and summary can need about 9,500 tokens for a single review,
+more than the free tier allows in one request. The app then explains that the interview is too
+long for the current usage limits instead of failing silently. A paid tier raises these
+limits.
 
 ## How it works
 
@@ -103,9 +108,9 @@ for the open tab only, so a page refresh doesn't lose it.
   clients give brief answers to vague questions.
 - **Staying in character.** The prompt tells the client to react to "ignore your instructions"
   or "are you an AI?" as a confused customer would. Each reply is also checked in code for
-  phrases a customer would never say ("as an AI", "system prompt", "hidden needs"). If one
-  appears, the reply is regenerated once with a reminder, and if that fails too, a neutral
-  in-character line is used.
+  phrases a customer would never say ("as an AI", "system prompt", "hidden needs", or a stock
+  AI refusal such as "I'm sorry, but I can't comply with that"). If one appears, the reply is
+  regenerated once with a reminder, and if that fails too, a neutral in-character line is used.
 - **Temperature 0.5.** High enough that replies vary and sound natural, low enough to follow
   the rules. At 0.8 the client often volunteered private details in answer to general
   questions.
@@ -127,9 +132,31 @@ for the open tab only, so a page refresh doesn't lose it.
   everything the student told the client about them. The app also detects which products were
   named in the conversation, so the coach can't call the student's product information
   "accurate" when they never described any product.
+- **Key moments, pinned to the conversation.** The coach reads a numbered transcript and picks
+  out the turns that taught the most: a strong question, a hint from the client the student
+  didn't follow up, a wrong claim about a product, or a product pitched too early. The
+  feedback page shows each as the actual message with the coach's words highlighted. Each
+  moment is checked like the evidence: its quote must appear in a turn by the right speaker (a
+  missed cue must be the client's words), a wrong turn number is corrected from the quote, and
+  anything that can't be placed is dropped. Moments are checked one by one, so a bad one never
+  makes the whole review unusable.
 - **Prompt-injection guard.** The transcript and summary are marked as the student's work to
   assess, and any instructions inside them are ignored.
 - **Temperature 0.2,** so the same interview gets essentially the same verdict every time.
+
+### Model routing
+
+- **One model per role**, chosen for that job: a fast conversational model for the client and
+  a stronger model with reliable JSON output for the coach. Temperature, reply length and JSON
+  mode are set per role in code, as part of each chatbot's design.
+- **A backup model per role.** If the main model is rate-limited, over its limits, too slow or
+  down, the backup answers straight away instead of the student waiting through retries or
+  seeing an error. After a rate limit, the main model is skipped for as long as the provider
+  asked, so later calls don't waste a failed attempt first. Configuration errors, such as a
+  bad key or an unknown model, are never hidden this way.
+- **Visible in the logs.** Each AI call logs one line with the role, model, outcome, response
+  time and tokens used, plus why the backup answered when it did, for example
+  `[backup: openai/gpt-oss-120b was RATE_LIMITED]`.
 
 ### Checking the AI's behaviour
 
@@ -138,7 +165,9 @@ checked repeatedly against the live models with fixed scenarios. Examples: gener
 that must not reveal hidden needs, targeted questions that should, prompt-injection attempts,
 "are you an AI?", unsuitable product pitches the client should push back on, weak and strong
 interviews, and a false product claim the coach must catch. These checks led to changes such
-as the client's temperature and wording rules for the coach's feedback.
+as the client's temperature, wording rules for the coach's feedback, stricter definitions for
+the key moments, and catching stock AI refusals. The backup model went through the same
+checks in both roles before it was suggested.
 
 ### Left out on purpose
 
@@ -198,7 +227,7 @@ touching code, and the server checks them when it starts and says exactly what t
 | Command             | What it does                                           |
 | ------------------- | ------------------------------------------------------ |
 | `npm run dev`       | Runs the API server and the React app with live reload |
-| `npm run check:ai`  | Checks the AI connection and both models               |
+| `npm run check:ai`  | Checks the AI connection and every model (backups too) |
 | `npm run build`     | Type-checks and builds everything for production       |
 | `npm start`         | Serves the built app and the API from one port         |
 | `npm test`          | Runs the unit tests (no API key needed)                |
