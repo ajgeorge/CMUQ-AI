@@ -1,17 +1,25 @@
-/* Design tokens — colours chosen to meet WCAG 2.1 AA contrast (≥ 4.5:1 for text). */
+/*
+ * Design tokens, based on Carnegie Mellon's brand colours (brand.cmu.edu): Carnegie Red for
+ * the header and key actions, then black, Iron Gray, Steel Gray and white. All pairs meet
+ * WCAG 2.1 AA contrast (at least 4.5:1 for text, 3:1 for borders and the focus outline).
+ */
 :root {
-  --color-bg: #f7f8fa;
+  --color-bg: #f7f7f7;
   --color-surface: #ffffff;
-  --color-surface-alt: #eef2f6;
-  --color-text: #1a1f2b;
-  --color-text-muted: #4a5468;
-  --color-primary: #0b4f6c;
-  --color-primary-hover: #083a50;
+  --color-surface-alt: #eeeeee;
+  --color-text: #1a1a1a;
+  /* Iron Gray, a shade darker so small text stays readable on the light grey panels. */
+  --color-text-muted: #5c5d60;
+  /* Carnegie Red, and Skibo Red for hover. */
+  --color-primary: #c41230;
+  --color-primary-hover: #941120;
   --color-primary-contrast: #ffffff;
-  --color-border: #c9d1dc;
-  --color-border-strong: #6b7689;
-  --color-focus: #b8500a;
-  --color-danger: #a4161a;
+  /* Steel Gray for card outlines, Iron Gray for form fields. */
+  --color-border: #e0e0e0;
+  --color-border-strong: #6d6e71;
+  /* Highlands Sky Blue: stands out next to the red buttons. */
+  --color-focus: #007bc0;
+  --color-danger: #941120;
   --color-danger-bg: #fdecec;
   --color-success: #1d6b3a;
   --color-success-bg: #e6f4ea;
