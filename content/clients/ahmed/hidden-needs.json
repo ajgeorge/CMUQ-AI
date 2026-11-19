@@ -2,6 +2,7 @@
   "needs": [
     {
       "id": "cash-flow-gap",
+      "title": "Gap between paying costs and getting paid",
       "importance": "critical",
       "description": "Corporate clients usually pay invoices 60 to 90 days after the event, but he has to pay staff and suppliers within 30 days. Twice this year he delayed paying suppliers, and once he used his personal savings to cover payroll.",
       "revealWhen": "The student asks about cash flow, how and when he gets paid, payment terms, working capital, or the biggest challenges in the business.",
@@ -13,6 +14,7 @@
     },
     {
       "id": "sharia-only",
+      "title": "Only uses Sharia-compliant products",
       "importance": "critical",
       "description": "He will only use Sharia-compliant banking and financing. Last year he turned down a conventional loan from his current bank for this reason. If offered an interest-based product, he declines firmly and explains why.",
       "revealWhen": "The student asks about his banking preferences, any requirements products must meet, or the type of financing he would consider, or the student recommends an interest-based product.",
@@ -23,6 +25,7 @@
     },
     {
       "id": "second-kitchen",
+      "title": "Plans to open a second kitchen",
       "importance": "medium",
       "description": "Plans to open a second central kitchen in Al Wakrah within 12 months. He needs about QAR 1.5 million: roughly QAR 900,000 for kitchen equipment and QAR 600,000 for fit-out and renovation.",
       "revealWhen": "The student asks about future plans, growth goals, or what the business needs in order to keep growing.",
@@ -33,6 +36,7 @@
     },
     {
       "id": "current-bank-service",
+      "title": "Frustrated with his current bank",
       "importance": "low",
       "description": "Currently banks elsewhere and is frustrated by slow responses and having to visit a branch for simple tasks. He would move his business account for better service.",
       "revealWhen": "The student asks about his current banking arrangements or how happy he is with his current bank.",

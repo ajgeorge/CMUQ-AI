@@ -2,6 +2,7 @@
   "needs": [
     {
       "id": "uk-university",
+      "title": "Daughter studying in the UK",
       "importance": "critical",
       "description": "Her daughter Layla plans to study in the UK in about 3 years. Tuition and living costs will be around GBP 50,000 a year (roughly QAR 230,000 to 250,000), paid in pounds for 3 to 4 years.",
       "revealWhen": "The student asks what 'the children's future' means specifically, about timelines, where the children will study, or which currency the costs will be in.",
@@ -12,6 +13,7 @@
     },
     {
       "id": "no-capital-risk",
+      "title": "Will not risk her capital",
       "importance": "critical",
       "description": "She lost about QAR 120,000 investing in shares in 2020 and will not accept any product where her capital could fall in value. She reacts strongly against investment funds.",
       "revealWhen": "The student asks about her attitude to risk, past investment experience, or how she would feel if the value went down, or the student recommends an investment fund.",
@@ -22,6 +24,7 @@
     },
     {
       "id": "emergency-access",
+      "title": "Needs some money available quickly",
       "importance": "medium",
       "description": "Wants part of her savings available at short notice for emergencies, rather than all of it locked away for a long term.",
       "revealWhen": "The student asks about access to her money, flexibility, or what would happen in an emergency.",
@@ -32,6 +35,7 @@
     },
     {
       "id": "second-child",
+      "title": "Son will study abroad too",
       "importance": "medium",
       "description": "Her son Omar is two years younger and is likely to study abroad too, so the plan needs to cover both children, with costs overlapping for a few years.",
       "revealWhen": "The student asks about the rest of the family, whether the plan should cover both children, or the longer-term picture.",

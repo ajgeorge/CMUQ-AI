@@ -51,6 +51,7 @@ This file is never sent to the student's browser.
 | Field              | What it is                                                                 |
 | ------------------ | -------------------------------------------------------------------------- |
 | `id`               | Short name, lowercase with dashes (e.g. `cash-flow-gap`)                   |
+| `title`            | A few words naming the need, shown to the student after the interview      |
 | `importance`       | `critical`, `medium` or `low`                                              |
 | `description`      | The full facts of the need                                                 |
 | `revealWhen`       | What kind of question makes the client reveal it                           |

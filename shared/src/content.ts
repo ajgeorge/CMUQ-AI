@@ -77,6 +77,8 @@ export type ClientProfile = z.infer<typeof ClientProfileSchema>;
 
 export const HiddenNeedSchema = z.strictObject({
   id: IdSchema,
+  /** A few words naming the need, shown on the feedback page. */
+  title: text,
   importance: z.enum(['critical', 'medium', 'low']),
   description: text,
   /** When the AI Client may reveal this need. */

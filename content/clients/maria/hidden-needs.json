@@ -2,6 +2,7 @@
   "needs": [
     {
       "id": "remittances",
+      "title": "Sends money home every month",
       "importance": "critical",
       "description": "Sends about QAR 3,000 to her family in Manila every month through an exchange house. She queues on her day off and pays around QAR 20 to 25 per transfer, plus a poor exchange rate.",
       "revealWhen": "The student asks about her regular expenses, her family, financial commitments, or sending money abroad.",
@@ -12,6 +13,7 @@
     },
     {
       "id": "card-debt-at-home",
+      "title": "Expensive credit card debt at home",
       "importance": "critical",
       "description": "Owes about QAR 12,000 (equivalent) on a credit card in the Philippines at roughly 36% annual interest, from her family's medical bills. She only pays the minimum each month and is embarrassed about it.",
       "revealWhen": "The student asks tactfully about existing loans, debts, credit cards or financial commitments. If asked bluntly or in a judging way, she gives a vague answer first and only shares details once the student is reassuring.",
@@ -22,6 +24,7 @@
     },
     {
       "id": "car-savings",
+      "title": "Saving for a car without risk",
       "importance": "medium",
       "description": "Wants to save about QAR 25,000 within a year to buy a used car. She is very risk-averse: she has never invested and does not want to risk losing any money.",
       "revealWhen": "The student asks about her goals, what she is saving for, her timeline, or how she feels about risk.",
